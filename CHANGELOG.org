@@ -6,7 +6,7 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
-* v0.0.1 版
+* v0.1.0 版
 1. 远程执行命令 （by SSH）
 2. 主机分组
 3. 主机/主机组 YAML 文件管理

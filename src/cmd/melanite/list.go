@@ -23,6 +23,12 @@ func initListSubCmd(app *cli.App) {
 			}
 		},
 	}
+
+	if app.Commands == nil {
+		app.Commands = cli.Commands{listSubCmd}
+	} else {
+		app.Commands = append(app.Commands, listSubCmd)
+	}
 }
 
 func listGroups() error {

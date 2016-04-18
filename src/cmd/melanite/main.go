@@ -63,6 +63,10 @@ func createConfFile() {
 level=error
 logFile=
 logType=console
+
+[DataSource]
+type=yaml
+conn=
 `
 	f.Write([]byte(defaultConfContent))
 }

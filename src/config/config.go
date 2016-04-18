@@ -13,4 +13,8 @@ type Config struct {
 		LogFile string `ini:"logFile"`
 		LogType string `ini:"logType"`
 	}
+	DataSource struct {
+		Type string `ini:"type"`
+		Conn string `ini:"conn"`
+	}
 }

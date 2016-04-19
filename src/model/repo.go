@@ -2,20 +2,20 @@ package model
 
 // Node store info for host
 type Node struct {
-	Name     string
-	IP       string
-	User     string
-	Password string
-	KeyPath  string
+	Name     string `yaml:"Name"`
+	IP       string `yaml:"IP"`
+	User     string `yaml:"User"`
+	Password string `yaml:"Password"`
+	KeyPath  string `yaml:"KeyPath"`
 }
 
-// Group store info for node group
-type Group struct {
-	Name  string
-	Nodes []Node
+// NodeGroup store info for node group
+type NodeGroup struct {
+	Name  string `yaml:"GroupName"`
+	Nodes []Node `yaml:"Nodes"`
 }
 
 type IRepo interface {
-	GetAllGroups() ([]Group, error)
-	GetNodesByGroupName(groupName string) ([]Node, error)
+	GetNodeGroups(gName string) ([]NodeGroup, error)
+	GetNodesByNodeGroupName(gName string, nName string) ([]Node, error)
 }

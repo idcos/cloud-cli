@@ -3,6 +3,7 @@ package yamlrepo
 import (
 	"io/ioutil"
 	"model"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -26,11 +27,36 @@ func New(yamlFilePath string) (*YAMLRepo, error) {
 }
 
 func (yp *YAMLRepo) GetNodeGroups(gName string) ([]model.NodeGroup, error) {
+	var filterNodeGroups = make([]model.NodeGroup, 0)
 
-	return nil, nil
+	if yp == nil {
+		return filterNodeGroups, nil
+	}
+
+	for _, g := range yp.NodeGroups {
+		if strings.Contains(g.Name, gName) {
+			filterNodeGroups = append(filterNodeGroups, g)
+		}
+	}
+
+	return filterNodeGroups, nil
 }
 
 func (yp *YAMLRepo) GetNodesByGroupName(gName, nName string) ([]model.Node, error) {
+	var filterNodes = make([]model.Node, 0)
+	var groups, _ = yp.GetNodeGroups(gName)
 
-	return nil, nil
+	for _, g := range groups {
+		if g.Nodes == nil {
+			continue
+		}
+
+		for _, n := range g.Nodes {
+			if strings.Contains(n.Name, nName) {
+				filterNodes = append(filterNodes, n)
+			}
+		}
+	}
+
+	return filterNodes, nil
 }

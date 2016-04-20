@@ -1,6 +1,8 @@
 package main
 
 import (
+	"config"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -8,12 +10,24 @@ import (
 
 	"util"
 
+	"config/iniconf"
+
+	"logger"
+
+	"strings"
+
+	"model/yamlrepo"
+
+	"github.com/astaxie/beego/logs"
 	"github.com/codegangsta/cli"
 )
 
 var (
 	version  = "v0.1.0"
 	confPath = ".melanite.ini"
+	conf     *config.Config
+	log      *logs.BeeLogger
+	repo     *yamlrepo.YAMLRepo
 )
 
 func init() {
@@ -25,32 +39,63 @@ func main() {
 	app := cli.NewApp()
 	app.Version = version
 	app.Name = "Melanite (CLI tool)"
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "init",
-			Usage: "init melanite's setting file",
-		},
+
+	if err := checkConfigFile(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	app.Action = func(c *cli.Context) {
-		if c.Bool("init") {
-			createConfFile()
-			return
+	initListSubCmd(app)
+
+	if err := app.Run(os.Args); err != nil {
+		fmt.Println(err)
+	}
+}
+
+func GetConfig() *config.Config {
+	return conf
+}
+
+func GetLogger() *logs.BeeLogger {
+	return log
+}
+
+func GetRepo() *yamlrepo.YAMLRepo {
+	if repo == nil {
+		repo, _ = yamlrepo.New(conf.DataSource.Conn)
+	}
+	return repo
+}
+
+func checkConfigFile() error {
+	var err error
+	if !util.FileExist(confPath) {
+		if !util.Confirm("Do you want to create your config file?(y or n)") {
+			return errors.New("You should create your init config file")
 		}
-
-		cli.ShowAppHelp(c)
+		createConfFile()
 	}
 
-	app.Run(os.Args)
+	load := iniconf.New(confPath)
+	conf, err = load.Load()
+	if err != nil {
+		return err
+	}
+
+	if conf.DataSource.Conn == "" || conf.DataSource.Type == "" {
+		return errors.New(fmt.Sprintf("You should set DataSource in your config file: %s", confPath))
+	}
+
+	// fmt.Printf("conf: %v\n", conf)
+	if strings.ToLower(conf.Logger.LogType) == "console" {
+		log = logger.NewConsoleLogger(conf.Logger.Level)
+	} else {
+		log = logger.NewFileLogger(conf.Logger.LogFile, conf.Logger.Level)
+	}
+	return nil
 }
 
 func createConfFile() {
-	if util.FileExist(confPath) {
-		if !util.Confirm("config file is already existed, Do you want to overwrite it?(y or n)") {
-			return
-		}
-	}
-
 	f, err := os.Create(confPath)
 	if err != nil {
 		fmt.Println("create config file error: %s", err)

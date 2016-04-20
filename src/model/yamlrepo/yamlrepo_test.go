@@ -35,20 +35,29 @@ NodeGroups:
             KeyPath: keypathzzz
 `
 
-func TestYAMLRepo(t *testing.T) {
+func prepareYAML() (string, error) {
 	tempfile, err := ioutil.TempFile("", "test.yaml")
 	if err != nil {
-		t.Errorf("prepare yaml file failed: %v", err)
+		return "", err
 	}
 
-	defer os.Remove(tempfile.Name())
 	tempfile.WriteString(yamlStr)
 	if err = tempfile.Close(); err != nil {
-		t.Errorf("prepare yaml file content failed: %v", err)
+		return "", err
 	}
 
+	return tempfile.Name(), nil
+}
+
+func TestYAMLRepo(t *testing.T) {
+	yamlFilePath, err := prepareYAML()
+	if err != nil {
+		t.Errorf("prepare yaml file content failed: %v", err)
+	}
+	defer os.Remove(yamlFilePath)
+
 	var yamlRepo *YAMLRepo
-	if yamlRepo, err = New(tempfile.Name()); err != nil {
+	if yamlRepo, err = New(yamlFilePath); err != nil {
 		t.Errorf("new yaml repo failed: %v", err)
 	}
 
@@ -60,5 +69,86 @@ func TestYAMLRepo(t *testing.T) {
 		if len(g.Nodes) != 2 {
 			t.Errorf("Hosts count is wrong")
 		}
+	}
+}
+
+func TestGetNodeGroups(t *testing.T) {
+	yamlFilePath, err := prepareYAML()
+	if err != nil {
+		t.Errorf("prepare yaml file content failed: %v", err)
+	}
+	defer os.Remove(yamlFilePath)
+
+	var yamlRepo *YAMLRepo
+	groups, err := yamlRepo.GetNodeGroups("")
+	if len(groups) != 0 {
+		t.Errorf("group count must equal 0")
+	}
+
+	if yamlRepo, err = New(yamlFilePath); err != nil {
+		t.Errorf("new yaml repo failed: %v", err)
+	}
+
+	groups, err = yamlRepo.GetNodeGroups("")
+	if len(groups) != 2 {
+		t.Errorf("group count must equal 2")
+	}
+
+	groups, err = yamlRepo.GetNodeGroups("xx")
+	if len(groups) != 1 {
+		t.Errorf("group count must equal 1")
+	}
+
+	groups, err = yamlRepo.GetNodeGroups("grou")
+	if len(groups) != 2 {
+		t.Errorf("group count must equal 2")
+	}
+}
+
+func TestGetNodesByGroupName(t *testing.T) {
+	yamlFilePath, err := prepareYAML()
+	if err != nil {
+		t.Errorf("prepare yaml file content failed: %v", err)
+	}
+	defer os.Remove(yamlFilePath)
+
+	var yamlRepo *YAMLRepo
+	groups, err := yamlRepo.GetNodesByGroupName("", "")
+	if len(groups) != 0 {
+		t.Errorf("group count must equal 0")
+	}
+
+	if yamlRepo, err = New(yamlFilePath); err != nil {
+		t.Errorf("new yaml repo failed: %v", err)
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("", "")
+	if len(groups) != 4 {
+		t.Errorf("group count must equal 4")
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("xx", "")
+	if len(groups) != 2 {
+		t.Errorf("group count must equal 2")
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("grou", "")
+	if len(groups) != 4 {
+		t.Errorf("group count must equal 4")
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("", "xx")
+	if len(groups) != 2 {
+		t.Errorf("group count must equal 2")
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("", "zz")
+	if len(groups) != 1 {
+		t.Errorf("group count must equal 1")
+	}
+
+	groups, err = yamlRepo.GetNodesByGroupName("", "name")
+	if len(groups) != 4 {
+		t.Errorf("group count must equal 4")
 	}
 }

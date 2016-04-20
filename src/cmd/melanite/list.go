@@ -13,13 +13,19 @@ func initListSubCmd(app *cli.App) {
 				Value: "",
 				Usage: "list group and it's nodes",
 			},
+			cli.StringFlag{
+				Name:  "n,node",
+				Value: "",
+				Usage: "list nodes",
+			},
 		},
 		Action: func(c *cli.Context) {
 			var groupName = c.String("group")
+			var nodeName = c.String("node")
 			if groupName == "" {
-				listGroups()
+				listGroups(groupName)
 			} else {
-				listNodes(groupName)
+				listNodes(groupName, nodeName)
 			}
 		},
 	}

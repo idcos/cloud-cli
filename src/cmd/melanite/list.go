@@ -37,10 +37,11 @@ func initListSubCmd(app *cli.App) {
 	}
 }
 
-func listGroups() error {
+func listGroups(groupName string) error {
+
 	return nil
 }
 
-func listNodes(groupName string) error {
+func listNodes(groupName, nodeName string) error {
 	return nil
 }

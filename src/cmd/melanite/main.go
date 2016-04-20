@@ -42,6 +42,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	initListSubCmd(app)
+
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)
 	}
@@ -66,10 +68,12 @@ func checkConfigFile() error {
 		return errors.New(fmt.Sprintf("You should set DataSource in your config file: %s", confPath))
 	}
 
+	// fmt.Printf("conf: %v\n", conf)
 	if strings.ToLower(conf.Logger.LogType) == "console" {
 		log = logger.NewConsoleLogger(conf.Logger.Level)
+	} else {
+		log = logger.NewFileLogger(conf.Logger.LogFile, conf.Logger.Level)
 	}
-	log = logger.NewFileLogger(conf.Logger.LogFile, conf.Logger.Level)
 	return nil
 }
 

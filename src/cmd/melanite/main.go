@@ -16,6 +16,8 @@ import (
 
 	"strings"
 
+	"model/yamlrepo"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/codegangsta/cli"
 )
@@ -25,6 +27,7 @@ var (
 	confPath = ".melanite.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger
+	repo     *yamlrepo.YAMLRepo
 )
 
 func init() {
@@ -47,6 +50,21 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func GetConfig() *config.Config {
+	return conf
+}
+
+func GetLogger() *logs.BeeLogger {
+	return log
+}
+
+func GetRepo() *yamlrepo.YAMLRepo {
+	if repo == nil {
+		repo, _ = yamlrepo.New(conf.DataSource.Conn)
+	}
+	return repo
 }
 
 func checkConfigFile() error {

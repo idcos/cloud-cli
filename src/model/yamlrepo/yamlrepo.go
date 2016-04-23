@@ -43,9 +43,10 @@ func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 }
 
 func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeGroup, error) {
-	var filterGroups, _ = yp.FilterNodeGroups(gName)
+	var groups, _ = yp.FilterNodeGroups(gName)
+	var filterGroups = make([]model.NodeGroup, 0)
 
-	for _, g := range filterGroups {
+	for _, g := range groups {
 		if g.Nodes == nil {
 			continue
 		}
@@ -56,7 +57,12 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 				filterNodes = append(filterNodes, n)
 			}
 		}
-		g.Nodes = filterNodes
+
+		// only return groups which has nodes
+		if len(filterNodes) > 0 {
+			g.Nodes = filterNodes
+			filterGroups = append(filterGroups, g)
+		}
 	}
 
 	return filterGroups, nil

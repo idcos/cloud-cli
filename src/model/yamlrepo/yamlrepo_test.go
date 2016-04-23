@@ -72,7 +72,7 @@ func TestYAMLRepo(t *testing.T) {
 	}
 }
 
-func TestGetNodeGroups(t *testing.T) {
+func TestFilterNodeGroups(t *testing.T) {
 	yamlFilePath, err := prepareYAML()
 	if err != nil {
 		t.Errorf("prepare yaml file content failed: %v", err)
@@ -80,7 +80,7 @@ func TestGetNodeGroups(t *testing.T) {
 	defer os.Remove(yamlFilePath)
 
 	var yamlRepo *YAMLRepo
-	groups, err := yamlRepo.GetNodeGroups("")
+	groups, err := yamlRepo.FilterNodeGroups("")
 	if len(groups) != 0 {
 		t.Errorf("group count must equal 0")
 	}
@@ -89,23 +89,23 @@ func TestGetNodeGroups(t *testing.T) {
 		t.Errorf("new yaml repo failed: %v", err)
 	}
 
-	groups, err = yamlRepo.GetNodeGroups("")
+	groups, err = yamlRepo.FilterNodeGroups("")
 	if len(groups) != 2 {
 		t.Errorf("group count must equal 2")
 	}
 
-	groups, err = yamlRepo.GetNodeGroups("xx")
+	groups, err = yamlRepo.FilterNodeGroups("xx")
 	if len(groups) != 1 {
 		t.Errorf("group count must equal 1")
 	}
 
-	groups, err = yamlRepo.GetNodeGroups("grou")
+	groups, err = yamlRepo.FilterNodeGroups("grou")
 	if len(groups) != 2 {
 		t.Errorf("group count must equal 2")
 	}
 }
 
-func TestGetNodesByGroupName(t *testing.T) {
+func TestFilterNodeGroupsAndNodes(t *testing.T) {
 	yamlFilePath, err := prepareYAML()
 	if err != nil {
 		t.Errorf("prepare yaml file content failed: %v", err)
@@ -113,7 +113,7 @@ func TestGetNodesByGroupName(t *testing.T) {
 	defer os.Remove(yamlFilePath)
 
 	var yamlRepo *YAMLRepo
-	groups, err := yamlRepo.GetNodesByGroupName("", "")
+	groups, err := yamlRepo.FilterNodeGroupsAndNodes("", "")
 	if len(groups) != 0 {
 		t.Errorf("group count must equal 0")
 	}
@@ -122,33 +122,33 @@ func TestGetNodesByGroupName(t *testing.T) {
 		t.Errorf("new yaml repo failed: %v", err)
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("", "")
-	if len(groups) != 4 {
-		t.Errorf("group count must equal 4")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("", "")
+	if (len(groups[0].Nodes) + len(groups[1].Nodes)) != 4 {
+		t.Errorf("node count must equal 4")
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("xx", "")
-	if len(groups) != 2 {
-		t.Errorf("group count must equal 2")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("xx", "")
+	if len(groups[0].Nodes) != 2 {
+		t.Errorf("node count must equal 2")
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("grou", "")
-	if len(groups) != 4 {
-		t.Errorf("group count must equal 4")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("grou", "")
+	if (len(groups[0].Nodes) + len(groups[1].Nodes)) != 4 {
+		t.Errorf("node count must equal 4")
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("", "xx")
-	if len(groups) != 2 {
-		t.Errorf("group count must equal 2")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("", "xx")
+	if (len(groups[0].Nodes) + len(groups[1].Nodes)) != 2 {
+		t.Errorf("node count must equal 2")
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("", "zz")
-	if len(groups) != 1 {
-		t.Errorf("group count must equal 1")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("", "zz")
+	if len(groups[0].Nodes) != 1 {
+		t.Errorf("node count must equal 1")
 	}
 
-	groups, err = yamlRepo.GetNodesByGroupName("", "name")
-	if len(groups) != 4 {
-		t.Errorf("group count must equal 4")
+	groups, err = yamlRepo.FilterNodeGroupsAndNodes("", "name")
+	if (len(groups[0].Nodes) + len(groups[1].Nodes)) != 4 {
+		t.Errorf("node count must equal 4")
 	}
 }

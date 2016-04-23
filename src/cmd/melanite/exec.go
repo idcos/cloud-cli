@@ -54,7 +54,7 @@ func initExecSubCmd(app *cli.App) {
 				fmt.Println(err)
 				cli.ShowCommandHelp(c, "exec")
 			}
-			if err = exeCmd(ep); err != nil {
+			if err = execCmd(ep); err != nil {
 				fmt.Println(err)
 			}
 		},
@@ -90,7 +90,7 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 	return ep, nil
 }
 
-func exeCmd(ep execParams) error {
+func execCmd(ep execParams) error {
 
 	return nil
 }

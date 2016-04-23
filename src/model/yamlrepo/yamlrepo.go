@@ -26,7 +26,7 @@ func New(yamlFilePath string) (*YAMLRepo, error) {
 	return &yamlRepo, err
 }
 
-func (yp *YAMLRepo) GetNodeGroups(gName string) ([]model.NodeGroup, error) {
+func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 	var filterNodeGroups = make([]model.NodeGroup, 0)
 
 	if yp == nil {
@@ -42,21 +42,22 @@ func (yp *YAMLRepo) GetNodeGroups(gName string) ([]model.NodeGroup, error) {
 	return filterNodeGroups, nil
 }
 
-func (yp *YAMLRepo) GetNodesByGroupName(gName, nName string) ([]model.Node, error) {
-	var filterNodes = make([]model.Node, 0)
-	var groups, _ = yp.GetNodeGroups(gName)
+func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeGroup, error) {
+	var filterGroups, _ = yp.FilterNodeGroups(gName)
 
-	for _, g := range groups {
+	for _, g := range filterGroups {
 		if g.Nodes == nil {
 			continue
 		}
 
+		var filterNodes = make([]model.Node, 0)
 		for _, n := range g.Nodes {
 			if strings.Contains(n.Name, nName) {
 				filterNodes = append(filterNodes, n)
 			}
 		}
+		g.Nodes = filterNodes
 	}
 
-	return filterNodes, nil
+	return filterGroups, nil
 }

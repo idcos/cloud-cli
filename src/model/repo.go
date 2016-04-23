@@ -16,6 +16,6 @@ type NodeGroup struct {
 }
 
 type IRepo interface {
-	GetNodeGroups(gName string) ([]NodeGroup, error)
-	GetNodesByNodeGroupName(gName string, nName string) ([]Node, error)
+	FilterNodeGroups(gName string) ([]NodeGroup, error)
+	FilterNodeGroupsAndNodes(gName string, nName string) ([]NodeGroup, error)
 }

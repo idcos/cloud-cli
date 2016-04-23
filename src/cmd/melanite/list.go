@@ -49,7 +49,7 @@ func listGroups(groupName string) error {
 	repo := GetRepo()
 	log := GetLogger()
 
-	var groups, err = repo.GetNodeGroups(groupName)
+	var groups, err = repo.FilterNodeGroups(groupName)
 	log.Debug("groups: %v", groups)
 	if err != nil {
 		return err
@@ -66,15 +66,20 @@ func listGroups(groupName string) error {
 func listNodes(groupName, nodeName string) error {
 	repo := GetRepo()
 
-	var nodes, err = repo.GetNodesByGroupName(groupName, nodeName)
+	var groups, err = repo.FilterNodeGroupsAndNodes(groupName, nodeName)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Nodes: >>>\n")
-	fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
-	for index, n := range nodes {
-		fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.IP)
+	for _, g := range groups {
+		fmt.Printf("Group(%s) Nodes: >>>\n", groupName)
+		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
+
+		for index, n := range g.Nodes {
+			fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.IP)
+		}
+
+		fmt.Println()
 	}
 
 	return nil

@@ -15,6 +15,7 @@ type NodeGroup struct {
 	Nodes []Node `yaml:"Nodes"`
 }
 
+// IRepo repo interface
 type IRepo interface {
 	FilterNodeGroups(gName string) ([]NodeGroup, error)
 	FilterNodeGroupsAndNodes(gName string, nName string) ([]NodeGroup, error)

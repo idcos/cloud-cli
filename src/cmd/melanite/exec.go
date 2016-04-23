@@ -9,9 +9,12 @@ import (
 )
 
 var (
+	// ErrGroupORNodeRequired require group or node option
 	ErrGroupORNodeRequired = errors.New("option -g/--group or -n/--node is required")
+	// ErrOnlyGroupOROnlyNode only group or only node option could exist
 	ErrOnlyGroupOROnlyNode = errors.New("option -g/--group and -n/--node couldn't exist at same time")
-	ErrCmdRequired         = errors.New("option -c/--cmd is required")
+	// ErrCmdRequired require cmd option
+	ErrCmdRequired = errors.New("option -c/--cmd is required")
 )
 
 type execParams struct {

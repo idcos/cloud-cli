@@ -2,7 +2,6 @@ package main
 
 import (
 	"config"
-	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -52,14 +51,17 @@ func main() {
 	}
 }
 
+// GetConfig get config info for melanite
 func GetConfig() *config.Config {
 	return conf
 }
 
+// GetLogger get logger for melanite
 func GetLogger() *logs.BeeLogger {
 	return log
 }
 
+// GetRepo get repo for melanite
 func GetRepo() *yamlrepo.YAMLRepo {
 	if repo == nil {
 		repo, _ = yamlrepo.New(conf.DataSource.Conn)
@@ -71,7 +73,7 @@ func checkConfigFile() error {
 	var err error
 	if !util.FileExist(confPath) {
 		if !util.Confirm("Do you want to create your config file?(y or n)") {
-			return errors.New("You should create your init config file")
+			return fmt.Errorf("You should create your init config file")
 		}
 		createConfFile()
 	}
@@ -83,7 +85,7 @@ func checkConfigFile() error {
 	}
 
 	if conf.DataSource.Conn == "" || conf.DataSource.Type == "" {
-		return errors.New(fmt.Sprintf("You should set DataSource in your config file: %s", confPath))
+		return fmt.Errorf("You should set DataSource in your config file: %s", confPath)
 	}
 
 	// fmt.Printf("conf: %v\n", conf)

@@ -2,21 +2,33 @@ package runner
 
 import "time"
 
-type RunnerInput struct {
+// Input input format for runner interface
+type Input struct {
+	// ExecUser username for exec command
 	ExecUser string
+	// ExecHost hostname for exec command
 	ExecHost string
-	Command  string
+	// Command command for exec
+	Command string
 }
 
-type RunnerOutput struct {
-	Status     string
+// Output output format for runner interface
+type Output struct {
+	// Status for exec result
+	Status string
+	// StatusCode code for exec result
 	StatusCode int
-	StdError   string
-	StdOutput  string
-	ExecStart  time.Time
-	ExecEnd    time.Time
+	// StdError error output for exec result
+	StdError string
+	// StdOutput normal output for exec result
+	StdOutput string
+	// ExecStart start time when exec command
+	ExecStart time.Time
+	// ExecEnd end time when exec command
+	ExecEnd time.Time
 }
 
-type Runner interface {
+// IRunner runner interface
+type IRunner interface {
 	SyncExec(input RunnerInput) (RunnerOutput, error)
 }

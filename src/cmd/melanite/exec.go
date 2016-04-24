@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"runner"
+	"runner/sshrunner"
 
 	"fmt"
 
@@ -11,8 +13,6 @@ import (
 var (
 	// ErrGroupORNodeRequired require group or node option
 	ErrGroupORNodeRequired = errors.New("option -g/--group or -n/--node is required")
-	// ErrOnlyGroupOROnlyNode only group or only node option could exist
-	ErrOnlyGroupOROnlyNode = errors.New("option -g/--group and -n/--node couldn't exist at same time")
 	// ErrCmdRequired require cmd option
 	ErrCmdRequired = errors.New("option -c/--cmd is required")
 )
@@ -56,6 +56,7 @@ func initExecSubCmd(app *cli.App) {
 			if err != nil {
 				fmt.Println(err)
 				cli.ShowCommandHelp(c, "exec")
+				return
 			}
 			if err = execCmd(ep); err != nil {
 				fmt.Println(err)
@@ -82,18 +83,52 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 		return ep, ErrGroupORNodeRequired
 	}
 
-	if ep.GroupName != "" && ep.NodeName != "" {
-		return ep, ErrOnlyGroupOROnlyNode
-	}
-
 	if ep.Cmd == "" {
 		return ep, ErrCmdRequired
+	}
+
+	if ep.User == "" {
+		ep.User = "root"
 	}
 
 	return ep, nil
 }
 
 func execCmd(ep execParams) error {
+	// TODO should use sshrunner from config
 
+	// get node info for exec
+	repo := GetRepo()
+	var groups, err = repo.FilterNodeGroupsAndNodes(ep.GroupName, ep.NodeName)
+	if err != nil {
+		return err
+	}
+
+	// exec cmd on node
+	for _, g := range groups {
+		for _, n := range g.Nodes {
+			fmt.Printf("start exec cmd(%s) on Group(%s)->Node(%s): >>>\n", ep.Cmd, g.Name, n.Name)
+			var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+			var input = runner.Input{
+				ExecHost: n.Host,
+				ExecUser: ep.User,
+				Command:  ep.Cmd,
+			}
+
+			// display result
+			if output, err := runCmd.SyncExec(input); err != nil {
+				fmt.Println(err)
+			} else {
+				displayExecResult(output)
+			}
+		}
+	}
 	return nil
+}
+
+func displayExecResult(output *runner.Output) {
+	fmt.Printf("start time: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
+	fmt.Printf("end time:   %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
+	fmt.Printf("stdout >>>\n%s\n", output.StdOutput)
+	fmt.Printf("stderr >>>\n%s\n", output.StdError)
 }

@@ -4,6 +4,7 @@ package model
 type Node struct {
 	Name     string `yaml:"Name"`
 	Host     string `yaml:"Host"`
+	Port     int    `yaml:"Port"`
 	User     string `yaml:"User"`
 	Password string `yaml:"Password"`
 	KeyPath  string `yaml:"KeyPath"`

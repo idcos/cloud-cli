@@ -16,8 +16,6 @@ type Input struct {
 type Output struct {
 	// Status for exec result
 	Status string
-	// StatusCode code for exec result
-	StatusCode int
 	// StdError error output for exec result
 	StdError string
 	// StdOutput normal output for exec result
@@ -30,5 +28,5 @@ type Output struct {
 
 // IRunner runner interface
 type IRunner interface {
-	SyncExec(input Input) (Output, error)
+	SyncExec(input Input) (*Output, error)
 }

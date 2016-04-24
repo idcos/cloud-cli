@@ -1,0 +1,14 @@
+#+STARTUP: showall
+#+OPTIONS: toc:t
+#+OPTIONS: num:t
+#+OPTIONS: html-postamble:nil
+#+LANGUAGE: zh-CN
+#+OPTIONS:   ^:{}
+#+TITLE: Melanite CHANGELOG
+
+* v0.1.0 版
+1. 远程执行命令 （by SSH）
+2. 主机分组
+3. 主机/主机组 YAML 文件管理
+
+	

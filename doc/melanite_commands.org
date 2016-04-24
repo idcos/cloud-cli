@@ -1,0 +1,61 @@
+#+STARTUP: showall
+#+OPTIONS: toc:t
+#+OPTIONS: num:t
+#+OPTIONS: html-postamble:nil
+#+LANGUAGE: zh-CN
+#+OPTIONS:   ^:{}
+#+TITLE: Melanite command introduction
+
+* melanite command
+#+BEGIN_EXAMPLE
+NAME:
+   Melanite (CLI tool) - A new cli application
+
+USAGE:
+   melanite [global options] command [command options] [arguments...]
+
+VERSION:
+   v0.1.0
+
+COMMANDS:
+    list        list <options>
+    exec        exec <options>
+
+GLOBAL OPTIONS:
+   --help, -h           show help
+   --version, -v        print the version
+#+END_EXAMPLE
+
+* subcommand _list_
+#+BEGIN_EXAMPLE
+NAME:
+   melanite list - list <options>
+
+USAGE:
+   melanite list [command options] [arguments...]
+
+DESCRIPTION:
+   list groups and nodes
+
+OPTIONS:
+   -g, --group  list group and it's nodes
+   -n, --node   list nodes
+#+END_EXAMPLE
+
+* subcommand _exec_
+#+BEGIN_EXAMPLE
+NAME:
+   melanite exec - exec <options>
+
+USAGE:
+   melanite exec [command options] [arguments...]
+
+DESCRIPTION:
+   exec command on groups or nodes
+
+OPTIONS:
+   -g, --group          exec command on group
+   -n, --node           exec command on node
+   -u, --user "root"    user who exec the command
+   -c, --cmd            command for exec
+#+END_EXAMPLE

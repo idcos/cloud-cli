@@ -1,0 +1,50 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/astaxie/beego/logs",
+			"repository": "https://github.com/astaxie/beego",
+			"revision": "88c5dfa6ead42e624c2e7d9e04eab6cb2d07412a",
+			"branch": "master",
+			"path": "/logs"
+		},
+		{
+			"importpath": "github.com/belogik/goes",
+			"repository": "https://github.com/belogik/goes",
+			"revision": "e54d722c3aff588e4c737fe11c07359019240824",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/codegangsta/cli",
+			"repository": "https://github.com/codegangsta/cli",
+			"revision": "71f57d300dd6a780ac1856c005c4b518cfd498ec",
+			"branch": "master"
+		},
+		{
+			"importpath": "golang.org/x/crypto/curve25519",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "7b428712abe956d0e9e1e9a01e163fb6c7171438",
+			"branch": "master",
+			"path": "/curve25519"
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "7b428712abe956d0e9e1e9a01e163fb6c7171438",
+			"branch": "master",
+			"path": "/ssh"
+		},
+		{
+			"importpath": "gopkg.in/ini.v1",
+			"repository": "https://gopkg.in/ini.v1",
+			"revision": "12f418cc7edc5a618a51407b7ac1f1f512139df3",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/yaml.v2",
+			"repository": "https://gopkg.in/yaml.v2",
+			"revision": "a83829b6f1293c91addabc89d0571c246397bbf4",
+			"branch": "v2"
+		}
+	]
+}

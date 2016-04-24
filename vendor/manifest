@@ -21,6 +21,20 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "golang.org/x/crypto/curve25519",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "7b428712abe956d0e9e1e9a01e163fb6c7171438",
+			"branch": "master",
+			"path": "/curve25519"
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "7b428712abe956d0e9e1e9a01e163fb6c7171438",
+			"branch": "master",
+			"path": "/ssh"
+		},
+		{
 			"importpath": "gopkg.in/ini.v1",
 			"repository": "https://gopkg.in/ini.v1",
 			"revision": "12f418cc7edc5a618a51407b7ac1f1f512139df3",

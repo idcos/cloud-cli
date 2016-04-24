@@ -30,5 +30,5 @@ type Output struct {
 
 // IRunner runner interface
 type IRunner interface {
-	SyncExec(input RunnerInput) (RunnerOutput, error)
+	SyncExec(input Input) (Output, error)
 }

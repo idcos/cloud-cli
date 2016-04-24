@@ -11,12 +11,12 @@ NodeGroups:
     - GroupName: groupxxx
       Nodes:
           - Name: namexxx
-            IP: ipxxx
+            Host: ipxxx
             User: userxxx
             Password: passwordxxx
             KeyPath: kaypathxxx
           - Name: nameyyy
-            IP: ipyyy
+            Host: ipyyy
             User: useryyy
             Password: passwordyyy
             KeyPath: keypathyyy
@@ -24,12 +24,12 @@ NodeGroups:
     - GroupName: groupyyy
       Nodes:
           - Name: namexxx
-            IP: ipxxx
+            Host: ipxxx
             User: userxxx
             Password: passwordxxx
             KeyPath: keypathxxx
           - Name: namezzz
-            IP: ipzzz
+            Host: ipzzz
             User: userzzz
             Password: passwordzzz
             KeyPath: keypathzzz

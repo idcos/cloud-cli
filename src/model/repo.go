@@ -3,7 +3,7 @@ package model
 // Node store info for host
 type Node struct {
 	Name     string `yaml:"Name"`
-	IP       string `yaml:"IP"`
+	Host     string `yaml:"Host"`
 	User     string `yaml:"User"`
 	Password string `yaml:"Password"`
 	KeyPath  string `yaml:"KeyPath"`

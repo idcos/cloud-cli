@@ -7,8 +7,11 @@ import (
 	"os"
 )
 
-var ErrFileExisted = "目标文件 %s 已经存在"
-var ErrMd5Check = "md5 信息不一致：当前MD5(%s)\t验证的MD5(%s)"
+// ErrFileExisted error message when file exist
+var ErrFileExisted = "target file %s is existed"
+
+// ErrMd5Check error message when check md5
+var ErrMd5Check = "md5 is not same: Origin MD5(%s)\tCurrent MD5(%s)"
 
 // Md5File generate md5 string
 func Md5File(filepath string) (string, error) {

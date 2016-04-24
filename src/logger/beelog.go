@@ -15,7 +15,9 @@ const (
 	// HomeDirFlag 当前用户家目录标识符
 	HomeDirFlag = "~"
 
-	FileLog    = "file"
+	// FileLog output log to file
+	FileLog = "file"
+	// ConsoleLog output log to console
 	ConsoleLog = "console"
 )
 

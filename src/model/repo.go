@@ -3,7 +3,8 @@ package model
 // Node store info for host
 type Node struct {
 	Name     string `yaml:"Name"`
-	IP       string `yaml:"IP"`
+	Host     string `yaml:"Host"`
+	Port     int    `yaml:"Port"`
 	User     string `yaml:"User"`
 	Password string `yaml:"Password"`
 	KeyPath  string `yaml:"KeyPath"`
@@ -15,6 +16,7 @@ type NodeGroup struct {
 	Nodes []Node `yaml:"Nodes"`
 }
 
+// IRepo repo interface
 type IRepo interface {
 	FilterNodeGroups(gName string) ([]NodeGroup, error)
 	FilterNodeGroupsAndNodes(gName string, nName string) ([]NodeGroup, error)

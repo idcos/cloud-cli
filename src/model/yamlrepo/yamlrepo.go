@@ -8,11 +8,15 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// YAMLRepo yaml format repo
 type YAMLRepo struct {
+	// YAMLFilePath yaml file path for repo
 	YAMLFilePath string
-	NodeGroups   []model.NodeGroup `yaml:"NodeGroups"`
+	// NodeGroups node groups info from yaml
+	NodeGroups []model.NodeGroup `yaml:"NodeGroups"`
 }
 
+// New create yaml repo
 func New(yamlFilePath string) (*YAMLRepo, error) {
 	var yamlRepo YAMLRepo
 	yamlRepo.YAMLFilePath = yamlFilePath
@@ -26,6 +30,7 @@ func New(yamlFilePath string) (*YAMLRepo, error) {
 	return &yamlRepo, err
 }
 
+// FilterNodeGroups find groups info from yaml repo
 func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 	var filterNodeGroups = make([]model.NodeGroup, 0)
 
@@ -42,6 +47,7 @@ func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 	return filterNodeGroups, nil
 }
 
+// FilterNodeGroupsAndNodes find nodes and groups info from yaml repo
 func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeGroup, error) {
 	var groups, _ = yp.FilterNodeGroups(gName)
 	var filterGroups = make([]model.NodeGroup, 0)

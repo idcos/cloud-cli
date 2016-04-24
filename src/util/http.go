@@ -11,10 +11,11 @@ import (
 	"path/filepath"
 )
 
-var ErrUploadFile = "上传文件失败：URL(%s)\nfilename(%s)\nmessage(%s)"
+// ErrUploadFile error message when upload file failed
+var ErrUploadFile = "upload file failed: URL(%s)\nfilename(%s)\nmessage(%s)"
 
 // PostFile post file to targetUrl
-func PostFile(fileParam, filePath string, extraParams map[string]string, targetUrl string) error {
+func PostFile(fileParam, filePath string, extraParams map[string]string, targetURL string) error {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 	var (
@@ -53,7 +54,7 @@ func PostFile(fileParam, filePath string, extraParams map[string]string, targetU
 
 	bodyWriter.Close()
 
-	resp, err = http.Post(targetUrl, contentType, bodyBuf)
+	resp, err = http.Post(targetURL, contentType, bodyBuf)
 	if err != nil {
 		return err
 	}
@@ -61,7 +62,7 @@ func PostFile(fileParam, filePath string, extraParams map[string]string, targetU
 
 	output, err = ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf(ErrUploadFile, targetUrl, filePath, string(output))
+		return fmt.Errorf(ErrUploadFile, targetURL, filePath, string(output))
 	}
 
 	return err

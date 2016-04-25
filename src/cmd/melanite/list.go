@@ -72,7 +72,7 @@ func listNodes(groupName, nodeName string) error {
 	}
 
 	for _, g := range groups {
-		fmt.Printf("Group(%s) Nodes: >>>\n", groupName)
+		fmt.Printf("Group(%s) Nodes: >>>\n", g.Name)
 		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
 
 		for index, n := range g.Nodes {

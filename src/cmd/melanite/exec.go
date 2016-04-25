@@ -116,17 +116,17 @@ func execCmd(ep execParams) error {
 			}
 
 			// display result
-			if output, err := runCmd.SyncExec(input); err != nil {
-				fmt.Println(err)
-			} else {
-				displayExecResult(output)
-			}
+			output, err := runCmd.SyncExec(input)
+			displayExecResult(output, err)
 		}
 	}
 	return nil
 }
 
-func displayExecResult(output *runner.Output) {
+func displayExecResult(output *runner.Output, err error) {
+	if err != nil {
+		fmt.Printf("Command exec failed: %s\n", err)
+	}
 	fmt.Printf("start time: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
 	fmt.Printf("end time:   %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
 	fmt.Printf("stdout >>>\n%s\n", output.StdOutput)

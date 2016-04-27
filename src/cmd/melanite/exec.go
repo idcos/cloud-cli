@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"runner"
 	"runner/sshrunner"
 
@@ -12,9 +11,11 @@ import (
 
 var (
 	// ErrGroupORNodeRequired require group or node option
-	ErrGroupORNodeRequired = errors.New("option -g/--group or -n/--node is required")
+	ErrGroupORNodeRequired = fmt.Errorf("option -g/--group or -n/--node is required")
 	// ErrCmdRequired require cmd option
-	ErrCmdRequired = errors.New("option -c/--cmd is required")
+	ErrCmdRequired = fmt.Errorf("option -c/--cmd is required")
+	// ErrNoNodeToExec no more node to execute
+	ErrNoNodeToExec = fmt.Errorf("found no node to execute")
 )
 
 type execParams struct {
@@ -102,6 +103,10 @@ func execCmd(ep execParams) error {
 	var groups, err = repo.FilterNodeGroupsAndNodes(ep.GroupName, ep.NodeName)
 	if err != nil {
 		return err
+	}
+
+	if len(groups) == 0 {
+		return ErrNoNodeToExec
 	}
 
 	// exec cmd on node

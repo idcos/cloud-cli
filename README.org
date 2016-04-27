@@ -26,31 +26,35 @@
 ** YAML 描述主机组和主机关系
 #+BEGIN_SRC yaml
 NodeGroups:
-    - GroupName: groupxxx
+    - GroupName: group001
       Nodes:
-          - Name: namexxx
-            IP: ipxxx
-            User: userxxx
-            Password: passwordxxx
-            KeyPath: kaypathxxx
-          - Name: nameyyy
-            IP: ipyyy
-            User: useryyy
-            Password: passwordyyy
-            KeyPath: keypathyyy
+          - Name: golang
+            Host: 192.168.1.1
+            Port: 22
+            User: user
+            Password: password
+            KeyPath: 
+          - Name: python
+            Host: 192.168.1.2
+            Port: 22
+            User: root
+            Password: rootpass
+            KeyPath: 
 
-    - GroupName: groupyyy
+    - GroupName: group002
       Nodes:
-          - Name: namexxx
-            IP: ipxxx
-            User: userxxx
-            Password: passwordxxx
-            KeyPath: keypathxxx
-          - Name: namezzz
-            IP: ipzzz
-            User: userzzz
-            Password: passwordzzz
-            KeyPath: keypathzzz
+          - Name: elixir-lang
+            Host: 10.0.0.1
+            Port: 22
+            User: testuser
+            Password: testtest
+            KeyPath: 
+          - Name: elm-lang
+            Host: elm-lang.cn
+            Port: 22
+            User: root
+            Password: 
+            KeyPath: /home/user/.ssh/private-key
 #+END_SRC
 
 * License

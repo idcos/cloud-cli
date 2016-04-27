@@ -32,7 +32,7 @@ func initExecSubCmd(app *cli.App) {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "g,group",
-				Value: "",
+				Value: "*",
 				Usage: "exec command on group",
 			},
 			cli.StringFlag{
@@ -131,8 +131,10 @@ func displayExecResult(output *runner.Output, err error) {
 	if output == nil {
 		return
 	}
-	fmt.Printf("start time: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
-	fmt.Printf("end time:   %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
-	fmt.Printf("stdout >>>\n%s\n", output.StdOutput)
-	fmt.Printf("stderr >>>\n%s\n", output.StdError)
+	fmt.Printf("START TIME: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
+	fmt.Printf("END   TIME: %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
+	fmt.Printf("STDOUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
+	if output.StdError != "" {
+		fmt.Printf("STDERR >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
+	}
 }

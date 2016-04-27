@@ -86,16 +86,17 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 
 	output.ExecStart = time.Now()
 	if err = session.Start(cmd); err != nil {
-		return nil, err
+		goto SSHResult
 	}
 
 	if err = session.Wait(); err != nil {
-		return nil, err
+		goto SSHResult
 	}
+
+SSHResult:
 	output.ExecEnd = time.Now()
 	output.StdOutput = string(stdout.Bytes())
 	output.StdError = string(stderr.Bytes())
-
 	return output, err
 }
 

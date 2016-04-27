@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"util"
+
 	"github.com/codegangsta/cli"
 )
 
@@ -14,24 +16,18 @@ func initListSubCmd(app *cli.App) {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "g,group",
-				Value: "",
+				Value: "*",
 				Usage: "list group and it's nodes",
 			},
 			cli.StringFlag{
 				Name:  "n,node",
-				Value: "",
+				Value: "*",
 				Usage: "list nodes",
 			},
 		},
 		Action: func(c *cli.Context) {
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
-			if groupName != "" && nodeName == "" {
-				if err := listGroups(groupName); err != nil {
-					fmt.Println(err)
-				}
-				return
-			}
 			if err := listNodes(groupName, nodeName); err != nil {
 				fmt.Println(err)
 			}
@@ -45,24 +41,6 @@ func initListSubCmd(app *cli.App) {
 	}
 }
 
-func listGroups(groupName string) error {
-	repo := GetRepo()
-	log := GetLogger()
-
-	var groups, err = repo.FilterNodeGroups(groupName)
-	log.Debug("groups: %v", groups)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Groups: >>>\n")
-	for index, g := range groups {
-		fmt.Printf("[%d] Name: %-10s\n", index+1, g.Name)
-	}
-
-	return nil
-}
-
 func listNodes(groupName, nodeName string) error {
 	repo := GetRepo()
 
@@ -72,7 +50,7 @@ func listNodes(groupName, nodeName string) error {
 	}
 
 	for _, g := range groups {
-		fmt.Printf("Group(%s) Nodes: >>>\n", groupName)
+		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
 		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
 
 		for index, n := range g.Nodes {

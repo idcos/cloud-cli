@@ -3,7 +3,10 @@ package yamlrepo
 import (
 	"io/ioutil"
 	"model"
-	"strings"
+
+	"util"
+
+	"regexp"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -38,8 +41,10 @@ func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 		return filterNodeGroups, nil
 	}
 
+	gNamePattern := util.WildCharToRegexp(gName)
 	for _, g := range yp.NodeGroups {
-		if strings.Contains(g.Name, gName) {
+		matched, _ := regexp.MatchString(gNamePattern, g.Name)
+		if matched {
 			filterNodeGroups = append(filterNodeGroups, g)
 		}
 	}
@@ -58,8 +63,11 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 		}
 
 		var filterNodes = make([]model.Node, 0)
+
+		nNamePattern := util.WildCharToRegexp(nName)
 		for _, n := range g.Nodes {
-			if strings.Contains(n.Name, nName) {
+			matched, _ := regexp.MatchString(nNamePattern, n.Name)
+			if matched {
 				filterNodes = append(filterNodes, n)
 			}
 		}
@@ -72,4 +80,26 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 	}
 
 	return filterGroups, nil
+}
+
+// FilterNodes find nodes info from yaml repo
+func (yp *YAMLRepo) FilterNodes(gName, nName string) ([]model.Node, error) {
+	var groups, _ = yp.FilterNodeGroups(gName)
+	var filterNodes = make([]model.Node, 0)
+
+	for _, g := range groups {
+		if g.Nodes == nil {
+			continue
+		}
+
+		nNamePattern := util.WildCharToRegexp(nName)
+		for _, n := range g.Nodes {
+			matched, _ := regexp.MatchString(nNamePattern, n.Name)
+			if matched {
+				filterNodes = append(filterNodes, n)
+			}
+		}
+	}
+
+	return filterNodes, nil
 }

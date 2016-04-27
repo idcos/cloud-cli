@@ -81,3 +81,25 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 
 	return filterGroups, nil
 }
+
+// FilterNodes find nodes info from yaml repo
+func (yp *YAMLRepo) FilterNodes(gName, nName string) ([]model.Node, error) {
+	var groups, _ = yp.FilterNodeGroups(gName)
+	var filterNodes = make([]model.Node, 0)
+
+	for _, g := range groups {
+		if g.Nodes == nil {
+			continue
+		}
+
+		nNamePattern := util.WildCharToRegexp(nName)
+		for _, n := range g.Nodes {
+			matched, _ := regexp.MatchString(nNamePattern, n.Name)
+			if matched {
+				filterNodes = append(filterNodes, n)
+			}
+		}
+	}
+
+	return filterNodes, nil
+}

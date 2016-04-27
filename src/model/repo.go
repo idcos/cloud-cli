@@ -20,4 +20,5 @@ type NodeGroup struct {
 type IRepo interface {
 	FilterNodeGroups(gName string) ([]NodeGroup, error)
 	FilterNodeGroupsAndNodes(gName string, nName string) ([]NodeGroup, error)
+	FilterNodes(gName string, nName string) ([]Node, error)
 }

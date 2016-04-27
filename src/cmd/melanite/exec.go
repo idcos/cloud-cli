@@ -1,20 +1,22 @@
 package main
 
 import (
-	"errors"
+	"model"
 	"runner"
 	"runner/sshrunner"
 
 	"fmt"
 
+	"util"
+
 	"github.com/codegangsta/cli"
 )
 
 var (
-	// ErrGroupORNodeRequired require group or node option
-	ErrGroupORNodeRequired = errors.New("option -g/--group or -n/--node is required")
 	// ErrCmdRequired require cmd option
-	ErrCmdRequired = errors.New("option -c/--cmd is required")
+	ErrCmdRequired = fmt.Errorf("option -c/--cmd is required")
+	// ErrNoNodeToExec no more node to execute
+	ErrNoNodeToExec = fmt.Errorf("found no node to execute")
 )
 
 type execParams struct {
@@ -32,7 +34,7 @@ func initExecSubCmd(app *cli.App) {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "g,group",
-				Value: "",
+				Value: "*",
 				Usage: "exec command on group",
 			},
 			cli.StringFlag{
@@ -54,12 +56,12 @@ func initExecSubCmd(app *cli.App) {
 		Action: func(c *cli.Context) {
 			var ep, err = checkExecParams(c)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(util.FgRed(err))
 				cli.ShowCommandHelp(c, "exec")
 				return
 			}
 			if err = execCmd(ep); err != nil {
-				fmt.Println(err)
+				fmt.Println(util.FgRed(err))
 			}
 		},
 	}
@@ -79,16 +81,8 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 		Cmd:       c.String("cmd"),
 	}
 
-	if ep.GroupName == "" && ep.NodeName == "" {
-		return ep, ErrGroupORNodeRequired
-	}
-
 	if ep.Cmd == "" {
 		return ep, ErrCmdRequired
-	}
-
-	if ep.User == "" {
-		ep.User = "root"
 	}
 
 	return ep, nil
@@ -99,40 +93,60 @@ func execCmd(ep execParams) error {
 
 	// get node info for exec
 	repo := GetRepo()
-	var groups, err = repo.FilterNodeGroupsAndNodes(ep.GroupName, ep.NodeName)
+	var nodes, err = repo.FilterNodes(ep.GroupName, ep.NodeName)
 	if err != nil {
 		return err
 	}
 
-	// exec cmd on node
-	for _, g := range groups {
-		for _, n := range g.Nodes {
-			fmt.Printf("start exec cmd(%s) on Group(%s)->Node(%s): >>>\n", ep.Cmd, g.Name, n.Name)
-			var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
-			var input = runner.Input{
-				ExecHost: n.Host,
-				ExecUser: ep.User,
-				Command:  ep.Cmd,
-			}
+	if len(nodes) == 0 {
+		return ErrNoNodeToExec
+	}
 
-			// display result
-			output, err := runCmd.SyncExec(input)
-			displayExecResult(output, err)
+	if !confirmExec(nodes, ep.User, ep.Cmd) {
+		return nil
+	}
+
+	// exec cmd on node
+	for _, n := range nodes {
+		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var input = runner.Input{
+			ExecHost: n.Host,
+			ExecUser: ep.User,
+			Command:  ep.Cmd,
 		}
+
+		// display result
+		output, err := runCmd.SyncExec(input)
+		displayExecResult(output, err)
 	}
 	return nil
 }
 
 func displayExecResult(output *runner.Output, err error) {
 	if err != nil {
-		fmt.Printf("Command exec failed: %s\n", err)
+		fmt.Printf("Command exec failed: %s\n", util.FgRed(err))
 	}
 
 	if output == nil {
 		return
 	}
-	fmt.Printf("start time: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
-	fmt.Printf("end time:   %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
-	fmt.Printf("stdout >>>\n%s\n", output.StdOutput)
-	fmt.Printf("stderr >>>\n%s\n", output.StdError)
+
+	fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDOUT >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
+	if output.StdError != "" {
+		fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDERR >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
+	}
+	fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
+	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+}
+
+func confirmExec(nodes []model.Node, user, cmd string) bool {
+	fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
+	for index, n := range nodes {
+		fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
+	}
+
+	fmt.Println()
+	return util.Confirm(fmt.Sprintf("You want to exec COMMAND(%s) by UESR(%s) at the above nodes, yes/no(y/n) ?",
+		util.FgBoldRed(cmd), util.FgBoldRed(user)))
 }

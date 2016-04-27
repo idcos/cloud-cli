@@ -6,7 +6,21 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
-* v0.1.0 版
+* v0.2.0 版 (2016-04-27)
+1. 重新规划了 list 子命令显示的内容
+   - list 显示所有group及其包含的所有nodes详细
+   - list -g "xx" 显示名称为xx的group及其包含的所有nodes详细信息
+   - list -g "xx" -n "yy" 显示名称为xx的group及其包含的名称为yy的node详细信息
+2. list和exec 子命令支持 -g 和 -n option中使用通配符(?和*）
+   - ? 匹配1个任意字符
+   - * 匹配0个或多个任意字符
+3. 命令执行时，以及返回结果中对某些信息加了颜色标识
+4. 返回结果中没有 stderr 信息，则不显示 stderr 标识
+5. 命令执行前提示执行的主机，命令，并确认是否执行
+6. 对 exec 子命令，如果输入的-g or -n 没有匹配到任何主机时，给出提示信息
+7. fix serval bugs
+
+* v0.1.0 版 (2016-04-24)
 1. 远程执行命令 （by SSH）
 2. 主机分组
 3. 主机/主机组 YAML 文件管理

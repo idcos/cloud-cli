@@ -24,6 +24,7 @@
 一个组可以包含一个或多个主机，一个主机也可以属于一个多个组。
 
 ** YAML 描述主机组和主机关系
+   配置密码和ssh-key的路径配置一个即可。
 #+BEGIN_SRC yaml
 NodeGroups:
     - GroupName: group001

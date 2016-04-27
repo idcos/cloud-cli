@@ -1,0 +1,79 @@
+#+STARTUP: showall
+#+OPTIONS: toc:t
+#+OPTIONS: num:t
+#+OPTIONS: html-postamble:nil
+#+LANGUAGE: zh-CN
+#+OPTIONS:   ^:{}
+#+TITLE: melanite 安装方法
+
+* 下载源码编译
+本工程是用 gb 编译的，gb 首页：https://getgb.io/
+
+下载编译：
+#+BEGIN_SRC sh
+git clone https://github.com/iotalabs/melanite.git
+cd melanite
+gb build
+#+END_SRC
+
+编译完成后，为了方便以后使用，可以将 bin 目录下的二进制文件 melanite 放在系统 PATH 中。
+
+* 首次使用
+首次使用时会提示创建配置文件，如果打算继续使用，请选择 *y*
+#+BEGIN_SRC sh
+$ melanite
+Do you want to create your config file?(y or n)y
+You should set DataSource in your config file: /path/to/you/home/.melanite.ini
+#+END_SRC
+
+生成的配置文件(.melanite.ini)中各项说明参见下面的小节 *配置文件说明*
+
+* 使用方式
+melanite 命令支持的子命令和各个参数请参见：[[file:doc/melanite_commands.org][命令使用说明]]
+
+* 配置文件说明
+配置文件示例：
+#+BEGIN_SRC ini
+[Logger]
+level=debug       # log 等级，可以配置  debug，info，warn，error
+logFile=          # 如果 logType 设置成 file，这里配置输出的log文件
+logType=console   # 这里支持 console 和 file 2种配置，console：log直接输出到终端，file：log输出到文件
+
+[DataSource]
+type=yaml         # 可以远程连接的主机信息，目前只支持 yaml格式
+conn=/path/to/test.yaml  # 存储主机和主机组信息的 yaml 数据源
+#+END_SRC
+
+存储主机和主机组信息的 yaml 文件示例：
+#+BEGIN_SRC yaml
+NodeGroups:
+    - GroupName: group001
+      Nodes:
+          - Name: golang
+            Host: 192.168.1.1
+            Port: 22
+            User: user
+            Password: password
+            KeyPath: 
+          - Name: python
+            Host: 192.168.1.2
+            Port: 22
+            User: root
+            Password: rootpass
+            KeyPath: 
+
+    - GroupName: group002
+      Nodes:
+          - Name: elixir-lang
+            Host: 10.0.0.1
+            Port: 22
+            User: testuser
+            Password: testtest
+            KeyPath: 
+          - Name: elm-lang
+            Host: elm-lang.cn
+            Port: 22
+            User: root
+            Password: 
+            KeyPath: /home/user/.ssh/private-key
+#+END_SRC

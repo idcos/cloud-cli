@@ -1,6 +1,6 @@
 #+STARTUP: showall
 #+OPTIONS: toc:t
-#+OPTIONS: num:t
+#+OPTIONS: num:nil
 #+OPTIONS: html-postamble:nil
 #+LANGUAGE: zh-CN
 #+OPTIONS:   ^:{}

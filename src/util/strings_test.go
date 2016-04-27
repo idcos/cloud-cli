@@ -7,13 +7,13 @@ func TestWildCharToRegexp(t *testing.T) {
 		inputStr  string
 		expectStr string
 	}{
-		{"gr.up", `gr\.up`},
-		{"gr*up", "gr.*up"},
-		{"gr?up", "gr.?up"},
-		{"gr.?up", "gr\\..?up"},
-		{"gr.*up", "gr\\..*up"},
-		{"gr.?.*up", "gr\\..?\\..*up"},
-		{"gr.?*up", "gr\\..?.*up"},
+		{"gr.up", `^gr\.up$`},
+		{"gr*up", "^gr.*up$"},
+		{"gr?up", "^gr.?up$"},
+		{"gr.?up", "^gr\\..?up$"},
+		{"gr.*up", "^gr\\..*up$"},
+		{"gr.?.*up", "^gr\\..?\\..*up$"},
+		{"gr.?*up", "^gr\\..?.*up$"},
 	}
 
 	for _, c := range cases {

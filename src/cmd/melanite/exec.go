@@ -127,6 +127,10 @@ func displayExecResult(output *runner.Output, err error) {
 	if err != nil {
 		fmt.Printf("Command exec failed: %s\n", err)
 	}
+
+	if output == nil {
+		return
+	}
 	fmt.Printf("start time: %s\n", output.ExecStart.Format("2006-01-02 15:04:05.000"))
 	fmt.Printf("end time:   %s\n", output.ExecEnd.Format("2006-01-02 15:04:05.000"))
 	fmt.Printf("stdout >>>\n%s\n", output.StdOutput)

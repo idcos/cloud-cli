@@ -10,8 +10,6 @@ import (
 )
 
 var (
-	// ErrGroupORNodeRequired require group or node option
-	ErrGroupORNodeRequired = fmt.Errorf("option -g/--group or -n/--node is required")
 	// ErrCmdRequired require cmd option
 	ErrCmdRequired = fmt.Errorf("option -c/--cmd is required")
 	// ErrNoNodeToExec no more node to execute
@@ -80,16 +78,8 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 		Cmd:       c.String("cmd"),
 	}
 
-	if ep.GroupName == "" && ep.NodeName == "" {
-		return ep, ErrGroupORNodeRequired
-	}
-
 	if ep.Cmd == "" {
 		return ep, ErrCmdRequired
-	}
-
-	if ep.User == "" {
-		ep.User = "root"
 	}
 
 	return ep, nil

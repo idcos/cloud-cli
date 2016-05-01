@@ -33,6 +33,10 @@ type SSHRunner struct {
 
 func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 
+	if port == 0 {
+		port = 22
+	}
+
 	return &SSHRunner{
 		User:       user,
 		Password:   password,

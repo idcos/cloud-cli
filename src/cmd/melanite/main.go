@@ -37,6 +37,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Version = version
+	app.EnableBashCompletion = true
 	app.Name = "Melanite (CLI tool)"
 
 	if err := checkConfigFile(); err != nil {

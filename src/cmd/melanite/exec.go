@@ -55,7 +55,7 @@ func initExecSubCmd(app *cli.App) {
 			},
 			cli.BoolFlag{
 				Name:  "y,yes",
-				Usage: "excute command without confirm",
+				Usage: "is confirm before excute command?",
 			},
 		},
 		Action: func(c *cli.Context) {

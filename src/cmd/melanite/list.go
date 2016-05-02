@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"model"
 
 	"util"
 
@@ -24,11 +25,16 @@ func initListSubCmd(app *cli.App) {
 				Value: "*",
 				Usage: "list nodes",
 			},
+			cli.BoolFlag{
+				Name:  "a,all",
+				Usage: "is list all info about node?",
+			},
 		},
 		Action: func(c *cli.Context) {
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
-			if err := listNodes(groupName, nodeName); err != nil {
+			var isDisplayAll = c.Bool("all")
+			if err := listNodes(groupName, nodeName, isDisplayAll); err != nil {
 				fmt.Println(err)
 			}
 		},
@@ -41,7 +47,7 @@ func initListSubCmd(app *cli.App) {
 	}
 }
 
-func listNodes(groupName, nodeName string) error {
+func listNodes(groupName, nodeName string, isDisplayAll bool) error {
 	repo := GetRepo()
 
 	var groups, err = repo.FilterNodeGroupsAndNodes(groupName, nodeName)
@@ -49,16 +55,35 @@ func listNodes(groupName, nodeName string) error {
 		return err
 	}
 
-	for _, g := range groups {
-		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
-		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
-
-		for index, n := range g.Nodes {
-			fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
-		}
-
-		fmt.Println()
+	if isDisplayAll {
+		displayDetailInfo(groups)
+	} else {
+		displaySimpleInfo(groups)
 	}
 
 	return nil
+}
+
+func displaySimpleInfo(groups []model.NodeGroup) {
+	for _, g := range groups {
+		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
+		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
+		fmt.Println(util.FgBoldBlue("=========================================================="))
+		for index, n := range g.Nodes {
+			fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
+		}
+		fmt.Println("")
+	}
+}
+
+func displayDetailInfo(groups []model.NodeGroup) {
+	for _, g := range groups {
+		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
+		fmt.Printf("%-3s\t%-10s\t%-30s\t%-5s\t%-8s\t%-15s\t%-20s\n", "No.", "Name", "IP", "Port", "User", "Password", "KeyPath")
+		fmt.Println(util.FgBoldBlue("========================================================================================================"))
+		for index, n := range g.Nodes {
+			fmt.Printf("%-3d\t%-10s\t%-30s\t%-5d\t%-8s\t%-15s\t%-20s\n", index+1, n.Name, n.Host, n.Port, n.User, n.Password, n.KeyPath)
+		}
+		fmt.Println("")
+	}
 }

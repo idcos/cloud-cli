@@ -24,6 +24,7 @@ type execParams struct {
 	NodeName  string
 	User      string
 	Cmd       string
+	Yes       bool
 }
 
 func initExecSubCmd(app *cli.App) {
@@ -52,6 +53,10 @@ func initExecSubCmd(app *cli.App) {
 				Value: "",
 				Usage: "command for exec",
 			},
+			cli.BoolFlag{
+				Name:  "y,yes",
+				Usage: "excute command without confirm",
+			},
 		},
 		Action: func(c *cli.Context) {
 			var ep, err = checkExecParams(c)
@@ -79,6 +84,7 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 		NodeName:  c.String("node"),
 		User:      c.String("user"),
 		Cmd:       c.String("cmd"),
+		Yes:       c.Bool("yes"),
 	}
 
 	if ep.Cmd == "" {
@@ -102,7 +108,7 @@ func execCmd(ep execParams) error {
 		return ErrNoNodeToExec
 	}
 
-	if !confirmExec(nodes, ep.User, ep.Cmd) {
+	if !ep.Yes && !confirmExec(nodes, ep.User, ep.Cmd) {
 		return nil
 	}
 

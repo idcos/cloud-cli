@@ -58,6 +58,16 @@ NodeGroups:
             KeyPath: /home/user/.ssh/private-key
 #+END_SRC
 
+** 命令自动补全
+ZSH 和 BASH 环境下启用自动补全方式是不一样的，启用方式如下：
+1. ZSH 环境下
+   #+BEGIN_SRC sh
+   source /path/to/melanite/autocomplete/zsh_completion
+   #+END_SRC
+2. BASH 环境下
+   #+BEGIN_SRC sh
+   source /path/to/melanite/autocomplete/bash_completion
+   #+END_SRC
 * License
 MIT License 2016 (Iota Labs)
 

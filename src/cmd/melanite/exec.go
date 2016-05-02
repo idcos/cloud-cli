@@ -2,6 +2,7 @@ package main
 
 import (
 	"model"
+	"os"
 	"runner"
 	"runner/sshrunner"
 
@@ -58,7 +59,15 @@ func initExecSubCmd(app *cli.App) {
 				Usage: "is confirm before excute command?",
 			},
 		},
+		BashComplete: func(c *cli.Context) {
+			bashComplete(c)
+		},
 		Action: func(c *cli.Context) {
+			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
+			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {
+				bashComplete(c)
+				return
+			}
 			var ep, err = checkExecParams(c)
 			if err != nil {
 				fmt.Println(util.FgRed(err))
@@ -127,6 +136,40 @@ func execCmd(ep execParams) error {
 		displayExecResult(output, err)
 	}
 	return nil
+}
+
+func completeGroups() {
+	repo := GetRepo()
+
+	groups, _ := repo.FilterNodeGroups("*")
+	for _, g := range groups {
+		fmt.Println(g.Name)
+	}
+}
+
+func completeNodes(gName string) {
+	repo := GetRepo()
+	nodes, _ := repo.FilterNodes(gName, "*")
+	for _, n := range nodes {
+		fmt.Println(n.Name)
+	}
+}
+
+func bashComplete(c *cli.Context) {
+	if isAutoComplete(c.String("group")) {
+		completeGroups()
+	}
+	if isAutoComplete(c.String("node")) {
+		completeNodes(c.String("group"))
+	}
+}
+
+func isAutoComplete(curStr string) bool {
+	// --generate-bash-completion is global option for cli
+	if curStr == "--generate-bash-completion" {
+		return true
+	}
+	return false
 }
 
 func displayExecResult(output *runner.Output, err error) {

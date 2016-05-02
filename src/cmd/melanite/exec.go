@@ -134,15 +134,13 @@ func displayExecResult(output *runner.Output, err error) {
 		fmt.Printf("Command exec failed: %s\n", util.FgRed(err))
 	}
 
-	if output == nil {
-		return
+	if output != nil {
+		fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDOUT >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
+		if output.StdError != "" {
+			fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDERR >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
+		}
+		fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
 	}
-
-	fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDOUT >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
-	if output.StdError != "" {
-		fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDERR >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
-	}
-	fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
 	fmt.Println(util.FgBoldBlue("==========================================================\n"))
 }
 

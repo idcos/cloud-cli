@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version  = "v0.1.0"
+	version  = "v0.3.0"
 	confPath = ".melanite.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger
@@ -37,6 +37,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Version = version
+	app.EnableBashCompletion = true
 	app.Name = "Melanite (CLI tool)"
 
 	if err := checkConfigFile(); err != nil {

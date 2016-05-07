@@ -53,7 +53,7 @@ func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 }
 
 // FilterNodeGroupsAndNodes find nodes and groups info from yaml repo
-func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeGroup, error) {
+func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName string, nNames ...string) ([]model.NodeGroup, error) {
 	var groups, _ = yp.FilterNodeGroups(gName)
 	var filterGroups = make([]model.NodeGroup, 0)
 
@@ -64,10 +64,8 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 
 		var filterNodes = make([]model.Node, 0)
 
-		nNamePattern := util.WildCharToRegexp(nName)
 		for _, n := range g.Nodes {
-			matched, _ := regexp.MatchString(nNamePattern, n.Name)
-			if matched {
+			if util.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)
 			}
 		}
@@ -83,7 +81,7 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName, nName string) ([]model.NodeG
 }
 
 // FilterNodes find nodes info from yaml repo
-func (yp *YAMLRepo) FilterNodes(gName, nName string) ([]model.Node, error) {
+func (yp *YAMLRepo) FilterNodes(gName string, nNames ...string) ([]model.Node, error) {
 	var groups, _ = yp.FilterNodeGroups(gName)
 	var filterNodes = make([]model.Node, 0)
 
@@ -92,10 +90,8 @@ func (yp *YAMLRepo) FilterNodes(gName, nName string) ([]model.Node, error) {
 			continue
 		}
 
-		nNamePattern := util.WildCharToRegexp(nName)
 		for _, n := range g.Nodes {
-			matched, _ := regexp.MatchString(nNamePattern, n.Name)
-			if matched {
+			if util.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)
 			}
 		}

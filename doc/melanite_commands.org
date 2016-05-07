@@ -15,15 +15,16 @@ USAGE:
    melanite [global options] command [command options] [arguments...]
 
 VERSION:
-   v0.1.0
+   v0.2.0
 
 COMMANDS:
     list        list <options>
     exec        exec <options>
 
 GLOBAL OPTIONS:
-   --help, -h           show help
-   --version, -v        print the version
+   --help, -h                   show help
+   --generate-bash-completion
+   --version, -v                print the version
 #+END_EXAMPLE
 
 * subcommand _list_
@@ -38,8 +39,9 @@ DESCRIPTION:
    list groups and nodes
 
 OPTIONS:
-   -g, --group  list group and it's nodes
-   -n, --node   list nodes
+   -g, --group "*"      list group and it's nodes
+   -n, --node "*"       list nodes
+   -a, --all            is list all info about node?
 #+END_EXAMPLE
 
 * subcommand _exec_
@@ -54,8 +56,9 @@ DESCRIPTION:
    exec command on groups or nodes
 
 OPTIONS:
-   -g, --group          exec command on group
-   -n, --node           exec command on node
-   -u, --user "root"    user who exec the command
-   -c, --cmd            command for exec
+   -g, --group "*"                      exec command on one group
+   -n, --node [-n option -n option]     exec command on one or more nodes
+   -u, --user "root"                    user who exec the command
+   -c, --cmd                            command for exec
+   -y, --yes                            is confirm before excute command?
 #+END_EXAMPLE

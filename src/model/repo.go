@@ -19,6 +19,6 @@ type NodeGroup struct {
 // IRepo repo interface
 type IRepo interface {
 	FilterNodeGroups(gName string) ([]NodeGroup, error)
-	FilterNodeGroupsAndNodes(gName string, nName string) ([]NodeGroup, error)
-	FilterNodes(gName string, nName string) ([]Node, error)
+	FilterNodeGroupsAndNodes(gName string, nNames ...string) ([]NodeGroup, error)
+	FilterNodes(gName string, nNames ...string) ([]Node, error)
 }

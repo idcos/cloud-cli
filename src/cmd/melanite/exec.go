@@ -22,7 +22,7 @@ var (
 
 type execParams struct {
 	GroupName string
-	NodeName  string
+	NodeNames []string
 	User      string
 	Cmd       string
 	Yes       bool
@@ -37,12 +37,12 @@ func initExecSubCmd(app *cli.App) {
 			cli.StringFlag{
 				Name:  "g,group",
 				Value: "*",
-				Usage: "exec command on group",
+				Usage: "exec command on one group",
 			},
-			cli.StringFlag{
+			cli.StringSliceFlag{
 				Name:  "n,node",
-				Value: "",
-				Usage: "exec command on node",
+				Value: &cli.StringSlice{},
+				Usage: "exec command on one or more nodes",
 			},
 			cli.StringFlag{
 				Name:  "u,user",
@@ -90,7 +90,7 @@ func initExecSubCmd(app *cli.App) {
 func checkExecParams(c *cli.Context) (execParams, error) {
 	var ep = execParams{
 		GroupName: c.String("group"),
-		NodeName:  c.String("node"),
+		NodeNames: c.StringSlice("node"),
 		User:      c.String("user"),
 		Cmd:       c.String("cmd"),
 		Yes:       c.Bool("yes"),
@@ -108,10 +108,7 @@ func execCmd(ep execParams) error {
 
 	// get node info for exec
 	repo := GetRepo()
-	var nodes, err = repo.FilterNodes(ep.GroupName, ep.NodeName)
-	if err != nil {
-		return err
-	}
+	var nodes, _ = repo.FilterNodes(ep.GroupName, ep.NodeNames...)
 
 	if len(nodes) == 0 {
 		return ErrNoNodeToExec

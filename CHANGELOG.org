@@ -12,18 +12,18 @@
    #+BEGIN_SRC sh
    melanite exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime'
    #+END_SRC
-3. exec 子命令 加入 -y/--yes 参数，此参数表示可以不用确认，直接执行
+2. exec 子命令 加入 -y/--yes 参数，此参数表示可以不用确认，直接执行
    示例： 
    #+BEGIN_SRC sh
    melanite exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime' -y
    #+END_SRC
-4. exec 子命令批量执行时，执行失败的节点和成功的节点之间加入分隔
-5. list 子命令 加入 -a/--all 参数，显示 node的所有信息
+3. exec 子命令批量执行时，执行失败的节点和成功的节点之间加入分隔
+4. list 子命令 加入 -a/--all 参数，显示 node的所有信息
    示例：
    #+BEGIN_SRC sh
    melanite list -a
    #+END_SRC
-6. exec 子命令可以自动补全 -g 和 -n option 后面的内容
+5. exec 子命令可以自动补全 -g 和 -n option 后面的内容
 
 * v0.2.0 版 (2016-04-27)
 1. 重新规划了 list 子命令显示的内容

@@ -185,7 +185,7 @@ func displayExecResult(output *runner.Output, err error) {
 }
 
 func confirmExec(nodes []model.Node, user, cmd string) bool {
-	fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "IP")
+	fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "Host")
 	fmt.Println("----------------------------------------------------------------------")
 	for index, n := range nodes {
 		fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)

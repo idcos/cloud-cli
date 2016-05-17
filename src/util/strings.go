@@ -1,9 +1,13 @@
 package util
 
 import (
+	"os/user"
 	"regexp"
 	"strings"
 )
+
+// HomeDirFlag 当前用户家目录标识符
+const HomeDirFlag = "~"
 
 // WildCharToRegexp change string with wildchar to regexp format string
 func WildCharToRegexp(s string) string {
@@ -13,6 +17,7 @@ func WildCharToRegexp(s string) string {
 	return "^" + s + "$"
 }
 
+// IsWildCharMatch check s is match one of wildCharStrs or not
 func IsWildCharMatch(s string, wildCharStrs ...string) bool {
 
 	var patterns = make([]string, 0)
@@ -27,4 +32,22 @@ func IsWildCharMatch(s string, wildCharStrs ...string) bool {
 		}
 	}
 	return false
+}
+
+// ConvertHomeDir convert ~ to user's home dir
+func ConvertHomeDir(raw string) (string, error) {
+	raw = strings.TrimSpace(raw)
+
+	if !strings.HasPrefix(raw, HomeDirFlag) {
+		return raw, nil
+	}
+
+	if !strings.HasPrefix(raw, HomeDirFlag) {
+		return raw, nil
+	}
+	user, err := user.Current()
+	if err != nil {
+		return raw, err
+	}
+	return strings.Replace(raw, HomeDirFlag, user.HomeDir, 1), nil
 }

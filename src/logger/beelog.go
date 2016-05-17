@@ -4,17 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/user"
 	"path"
 	"strings"
+
+	"util"
 
 	"github.com/astaxie/beego/logs"
 )
 
 const (
-	// HomeDirFlag 当前用户家目录标识符
-	HomeDirFlag = "~"
-
 	// FileLog output log to file
 	FileLog = "file"
 	// ConsoleLog output log to console
@@ -34,26 +32,9 @@ func selectLevel(level string) uint {
 	}
 }
 
-// 将~转化为用户家目录
-func rel2Abs(raw string) (string, error) {
-	raw = strings.TrimSpace(raw)
-
-	if !strings.HasPrefix(raw, HomeDirFlag) {
-		return raw, nil
-	}
-	user, err := user.Current()
-	if err != nil {
-		return raw, err
-	}
-	return strings.Replace(raw, HomeDirFlag, user.HomeDir, 1), nil
-}
-
 // NewFileLogger output to file
 func NewFileLogger(logFilePath, level string) *logs.BeeLogger {
-	filename := strings.TrimSpace(logFilePath)
-	if strings.HasPrefix(filename, HomeDirFlag) {
-		filename, _ = rel2Abs(filename)
-	}
+	filename, _ := util.ConvertHomeDir(logFilePath)
 
 	var logConf struct {
 		FileName string `json:"filename"`

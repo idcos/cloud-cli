@@ -21,10 +21,16 @@ type YAMLRepo struct {
 
 // New create yaml repo
 func New(yamlFilePath string) (*YAMLRepo, error) {
+	var err error
+	var buf []byte
 	var yamlRepo YAMLRepo
-	yamlRepo.YAMLFilePath = yamlFilePath
 
-	buf, err := ioutil.ReadFile(yamlFilePath)
+	yamlRepo.YAMLFilePath, err = util.ConvertHomeDir(yamlFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	buf, err = ioutil.ReadFile(yamlRepo.YAMLFilePath)
 	if err != nil {
 		return nil, err
 	}

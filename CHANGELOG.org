@@ -6,6 +6,11 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
+* v0.3.1 版（2016-05-17）
+1. 配置文件中支持路径使用 ~
+2. 解决 exec -n 参数补全无效的问题
+3. 解决 zsh source autocomplete 脚本时出现的错误（for MacOSX）
+
 * v0.3.0 版 (2016-05-07)
 1. exec 子命令 支持多个 -n 参数
    示例： 

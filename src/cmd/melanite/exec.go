@@ -163,7 +163,9 @@ func bashComplete(c *cli.Context) {
 
 func isAutoComplete(curStr string) bool {
 	// --generate-bash-completion is global option for cli
-	if curStr == "--generate-bash-completion" {
+	// "node" is a multi-option, so framework cli will add [--generate-bash-completion] after -n
+	if curStr == "--generate-bash-completion" ||
+		curStr == "[--generate-bash-completion]" {
 		return true
 	}
 	return false

@@ -61,13 +61,24 @@ NodeGroups:
 ** 命令自动补全
    ZSH 和 BASH 环境下启用自动补全方式是不一样的，启用方式如下：
 1. ZSH 环境下
+   把下面的代码加入到 .zshrc
    #+BEGIN_SRC sh
    source /path/to/melanite/autocomplete/zsh_completion
    #+END_SRC
 2. BASH 环境下
+   把下面的代码加入到 .bashrc
    #+BEGIN_SRC sh
    source /path/to/melanite/autocomplete/bash_completion
    #+END_SRC
+
+补充：
+1. 这2个 completion 脚本在 MacOSX 下已测试可以使用。
+   如果在 linux 下使用的话，请修改 bash_completion 中 */usr/local/etc/bash_completion* 的实际位置。
+2. 使用前安装 bash-completion package，Mac 下安装方式如下：
+   #+BEGIN_SRC sh
+   brew install bash-completion
+   #+END_SRC
+
 * License
 MIT License 2016 (Iota Labs)
 

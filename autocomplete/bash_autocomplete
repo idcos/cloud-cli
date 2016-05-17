@@ -1,6 +1,6 @@
 #! /bin/bash
 
-. /usr/local/etc/bash_completion
+/bin/bash /usr/local/etc/bash_completion
 
 _cli_bash_autocomplete() {
      local cur opts base

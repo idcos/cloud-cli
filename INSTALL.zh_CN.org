@@ -32,8 +32,11 @@ You should set DataSource in your config file: /path/to/you/home/.melanite.ini
 melanite 命令支持的子命令和各个参数请参见：[[file:doc/melanite_commands.org][命令使用说明]]
 
 * 配置文件说明
-配置文件示例：
+  配置文件示例：
 #+BEGIN_SRC ini
+[Main]
+sync=true         # 是否在多个node上并行执行命令  true: 串行执行  false: 并行执行
+
 [Logger]
 level=debug       # log 等级，可以配置  debug，info，warn，error
 logFile=          # 如果 logType 设置成 file，这里配置输出的log文件

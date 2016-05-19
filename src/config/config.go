@@ -8,6 +8,9 @@ type Loader interface {
 
 // Config config 数据结构体
 type Config struct {
+	Main struct {
+		Sync bool `ini:"sync"`
+	}
 	Logger struct {
 		Level   string `ini:"level"`
 		LogFile string `ini:"logFile"`

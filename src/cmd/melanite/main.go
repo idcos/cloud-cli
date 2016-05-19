@@ -108,7 +108,10 @@ func createConfFile() {
 
 	defer f.Close()
 
-	var defaultConfContent = `[Logger]
+	var defaultConfContent = `[Main]
+sync=true
+
+[Logger]
 level=error
 logFile=
 logType=console

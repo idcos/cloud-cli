@@ -36,6 +36,7 @@ melanite 命令支持的子命令和各个参数请参见：[[file:doc/melanite_
 #+BEGIN_SRC ini
 [Main]
 sync=true         # 是否在多个node上并行执行命令  true: 串行执行  false: 并行执行
+concurrentNum=5   # 并发执行的个数，sync=false 时生效
 timeout=10        # 命令执行的timeout时间，单位是秒
 
 [Logger]

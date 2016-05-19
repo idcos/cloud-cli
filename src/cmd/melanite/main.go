@@ -110,6 +110,7 @@ func createConfFile() {
 
 	var defaultConfContent = `[Main]
 sync=true
+concurrentNum=5
 timeout=30
 
 [Logger]

@@ -121,7 +121,7 @@ func execCmd(ep execParams) error {
 	}
 
 	// exec cmd on node
-	var outputs = make([]*runner.Output, 0)
+	var allOutputs = make([]*runner.Output, 0)
 	for _, n := range nodes {
 		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
@@ -136,10 +136,10 @@ func execCmd(ep execParams) error {
 		output, err := runCmd.SyncExec(input)
 		displayExecResult(output, err)
 		if output != nil {
-			outputs = append(outputs, output)
+			allOutputs = append(allOutputs, output)
 		}
 	}
-	displayTotalExecResult(outputs)
+	displayTotalExecResult(allOutputs)
 	return nil
 }
 

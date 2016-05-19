@@ -121,6 +121,7 @@ func execCmd(ep execParams) error {
 	}
 
 	// exec cmd on node
+	var outputs = make([]*runner.Output, 0)
 	for _, n := range nodes {
 		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
@@ -134,7 +135,11 @@ func execCmd(ep execParams) error {
 		// display result
 		output, err := runCmd.SyncExec(input)
 		displayExecResult(output, err)
+		if output != nil {
+			outputs = append(outputs, output)
+		}
 	}
+	displayTotalExecResult(outputs)
 	return nil
 }
 
@@ -145,12 +150,35 @@ func displayExecResult(output *runner.Output, err error) {
 
 	if output != nil {
 		fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDOUT >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
-		if output.StdError != "" {
+		if output.Status == runner.Fail {
 			fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDERR >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
 		}
 		fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
 	}
 	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+}
+
+func displayTotalExecResult(outputs []*runner.Output) {
+	var successCnt, failCnt, timeoutCnt int
+	var totalCostTime time.Duration
+
+	for _, output := range outputs {
+		switch output.Status {
+		case runner.Success:
+			successCnt += 1
+		case runner.Fail:
+			failCnt += 1
+		case runner.Timeout:
+			timeoutCnt += 1
+		}
+		totalCostTime += output.ExecEnd.Sub(output.ExecStart)
+	}
+
+	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s | timeout nodes: %s\n",
+		totalCostTime,
+		util.FgBoldGreen(successCnt),
+		util.FgBoldRed(failCnt),
+		util.FgBoldYellow(timeoutCnt))
 }
 
 func confirmExec(nodes []model.Node, user, cmd string) bool {

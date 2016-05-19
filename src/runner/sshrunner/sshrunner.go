@@ -49,19 +49,21 @@ func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 // SyncExec execute command sync
 func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 	var (
-		auth         []ssh.AuthMethod
-		addr         string
-		clientConfig *ssh.ClientConfig
-		client       *ssh.Client
-		session      *ssh.Session
-		err          error
-		output       = &runner.Output{Status: runner.Success}
+		auth           []ssh.AuthMethod
+		addr           string
+		clientConfig   *ssh.ClientConfig
+		client         *ssh.Client
+		session        *ssh.Session
+		err            error
+		output         = &runner.Output{Status: runner.Fail}
+		cmd            = compositCommand(input)
+		stdout, stderr bytes.Buffer
+		errChan        = make(chan error)
 	)
+	output.ExecStart = time.Now()
 
 	// get auth method
-	if auth, err = sr.authMethods(); err != nil {
-		// TODO warn this error
-	}
+	auth, _ = sr.authMethods()
 
 	clientConfig = &ssh.ClientConfig{
 		User:    sr.User,
@@ -73,24 +75,21 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 	addr = fmt.Sprintf("%s:%d", sr.Host, sr.Port)
 
 	if client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
-		return nil, err
+		output.Status = runner.Timeout
+		goto SSHRunnerResult
 	}
 	defer client.Close()
 
 	// create session
 	if session, err = client.NewSession(); err != nil {
-		return nil, err
+		goto SSHRunnerResult
 	}
 	defer session.Close()
 
 	// excute command
-	cmd := compositCommand(input)
-	var stdout, stderr bytes.Buffer
 	session.Stdout = &stdout
 	session.Stderr = &stderr
 
-	output.ExecStart = time.Now()
-	var errChan = make(chan error)
 	go func(session *ssh.Session) {
 		if err = session.Start(cmd); err != nil {
 			errChan <- err
@@ -109,11 +108,13 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 		output.Status = runner.Timeout
 	}
 
-	output.ExecEnd = time.Now()
 	output.StdOutput = string(stdout.Bytes())
 	output.StdError = string(stderr.Bytes())
-	if err != nil || output.StdError != "" {
-		output.Status = runner.Fail
+
+SSHRunnerResult:
+	output.ExecEnd = time.Now()
+	if err == nil && output.StdError == "" {
+		output.Status = runner.Success
 	}
 	return output, err
 }

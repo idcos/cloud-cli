@@ -10,8 +10,6 @@ import (
 
 	"util"
 
-	"strings"
-
 	"github.com/codegangsta/cli"
 )
 
@@ -135,41 +133,6 @@ func execCmd(ep execParams) error {
 		displayExecResult(output, err)
 	}
 	return nil
-}
-
-func completeGroups() {
-	repo := GetRepo()
-
-	groups, _ := repo.FilterNodeGroups("*")
-	for _, g := range groups {
-		fmt.Println(g.Name)
-	}
-}
-
-func completeNodes(gName string) {
-	repo := GetRepo()
-	nodes, _ := repo.FilterNodes(gName, "*")
-	for _, n := range nodes {
-		fmt.Println(n.Name)
-	}
-}
-
-func bashComplete(c *cli.Context) {
-	if isAutoComplete(c.String("group")) {
-		completeGroups()
-	}
-	if isAutoComplete(c.String("node")) {
-		completeNodes(c.String("group"))
-	}
-}
-
-func isAutoComplete(curStr string) bool {
-	// --generate-bash-completion is global option for cli
-	// "node" is a multi-option, so framework cli will add [--generate-bash-completion] after -n
-	if strings.Contains(curStr, "--generate-bash-completion") {
-		return true
-	}
-	return false
 }
 
 func displayExecResult(output *runner.Output, err error) {

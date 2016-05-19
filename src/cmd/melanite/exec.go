@@ -108,8 +108,6 @@ func execCmd(ep execParams) error {
 	// TODO should use sshrunner from config
 
 	// get node info for exec
-	repo := GetRepo()
-	conf := GetConfig()
 	var nodes, _ = repo.FilterNodes(ep.GroupName, ep.NodeNames...)
 
 	if len(nodes) == 0 {
@@ -121,6 +119,13 @@ func execCmd(ep execParams) error {
 	}
 
 	// exec cmd on node
+	if conf.Main.Sync {
+		return syncExecCmd(nodes, ep)
+	}
+	return nil
+}
+
+func syncExecCmd(nodes []model.Node, ep execParams) error {
 	var allOutputs = make([]*runner.Output, 0)
 	for _, n := range nodes {
 		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))

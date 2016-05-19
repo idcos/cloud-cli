@@ -8,8 +8,6 @@ import (
 )
 
 func completeGroups() {
-	repo := GetRepo()
-
 	groups, _ := repo.FilterNodeGroups("*")
 	for _, g := range groups {
 		fmt.Println(g.Name)
@@ -17,7 +15,6 @@ func completeGroups() {
 }
 
 func completeNodes(gName string) {
-	repo := GetRepo()
 	nodes, _ := repo.FilterNodes(gName, "*")
 	for _, n := range nodes {
 		fmt.Println(n.Name)

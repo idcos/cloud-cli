@@ -110,6 +110,7 @@ func createConfFile() {
 
 	var defaultConfContent = `[Main]
 sync=true
+timeout=30
 
 [Logger]
 level=error

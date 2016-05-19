@@ -5,6 +5,7 @@ import (
 	"os"
 	"runner"
 	"runner/sshrunner"
+	"time"
 
 	"fmt"
 
@@ -108,6 +109,7 @@ func execCmd(ep execParams) error {
 
 	// get node info for exec
 	repo := GetRepo()
+	conf := GetConfig()
 	var nodes, _ = repo.FilterNodes(ep.GroupName, ep.NodeNames...)
 
 	if len(nodes) == 0 {
@@ -126,6 +128,7 @@ func execCmd(ep execParams) error {
 			ExecHost: n.Host,
 			ExecUser: ep.User,
 			Command:  ep.Cmd,
+			Timeout:  time.Duration(conf.Main.Timeout) * time.Second,
 		}
 
 		// display result

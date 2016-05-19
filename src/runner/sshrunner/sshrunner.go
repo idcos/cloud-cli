@@ -90,15 +90,25 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 	session.Stderr = &stderr
 
 	output.ExecStart = time.Now()
-	if err = session.Start(cmd); err != nil {
-		goto SSHResult
+	var errChan = make(chan error)
+	go func(session *ssh.Session) {
+		if err = session.Start(cmd); err != nil {
+			errChan <- err
+		}
+
+		if err = session.Wait(); err != nil {
+			errChan <- err
+		}
+		errChan <- nil
+	}(session)
+
+	select {
+	case err = <-errChan:
+	case <-time.After(input.Timeout):
+		err = fmt.Errorf("exec command(%s) on host(%s) TIMEOUT", input.Command, input.ExecHost)
+		output.Status = runner.Timeout
 	}
 
-	if err = session.Wait(); err != nil {
-		goto SSHResult
-	}
-
-SSHResult:
 	output.ExecEnd = time.Now()
 	output.StdOutput = string(stdout.Bytes())
 	output.StdError = string(stderr.Bytes())

@@ -55,7 +55,7 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 		client       *ssh.Client
 		session      *ssh.Session
 		err          error
-		output       = &runner.Output{}
+		output       = &runner.Output{Status: runner.Success}
 	)
 
 	// get auth method
@@ -64,8 +64,9 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 	}
 
 	clientConfig = &ssh.ClientConfig{
-		User: sr.User,
-		Auth: auth,
+		User:    sr.User,
+		Auth:    auth,
+		Timeout: 30 * time.Second,
 	}
 
 	// connet to ssh
@@ -101,6 +102,9 @@ SSHResult:
 	output.ExecEnd = time.Now()
 	output.StdOutput = string(stdout.Bytes())
 	output.StdError = string(stderr.Bytes())
+	if err != nil || output.StdError != "" {
+		output.Status = runner.Fail
+	}
 	return output, err
 }
 

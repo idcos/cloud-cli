@@ -2,6 +2,14 @@ package runner
 
 import "time"
 
+type OutputStaus string
+
+const (
+	Fail    OutputStaus = "fail"
+	Success OutputStaus = "success"
+	Timeout OutputStaus = "timeout"
+)
+
 // Input input format for runner interface
 type Input struct {
 	// ExecUser username for exec command
@@ -10,12 +18,14 @@ type Input struct {
 	ExecHost string
 	// Command command for exec
 	Command string
+	// Timeout command exec timeout
+	Timeout time.Duration
 }
 
 // Output output format for runner interface
 type Output struct {
 	// Status for exec result
-	Status string
+	Status OutputStaus
 	// StdError error output for exec result
 	StdError string
 	// StdOutput normal output for exec result

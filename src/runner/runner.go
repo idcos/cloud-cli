@@ -34,9 +34,20 @@ type Output struct {
 	ExecStart time.Time
 	// ExecEnd end time when exec command
 	ExecEnd time.Time
+	// Err error info about exec command
+	Err error
+}
+
+//
+type ConcurrentOutput struct {
+	In  Input
+	Out *Output
 }
 
 // IRunner runner interface
 type IRunner interface {
-	SyncExec(input Input) (*Output, error)
+	// exec command sync
+	SyncExec(input Input) *Output
+	// exec command concurrency
+	ConcurrentExec(input Input, outputChan chan *ConcurrentOutput, limitChan chan int)
 }

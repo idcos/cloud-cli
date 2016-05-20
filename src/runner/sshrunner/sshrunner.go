@@ -47,7 +47,7 @@ func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 }
 
 // SyncExec execute command sync
-func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
+func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
 	var (
 		auth           []ssh.AuthMethod
 		addr           string
@@ -113,10 +113,19 @@ func (sr *SSHRunner) SyncExec(input runner.Input) (*runner.Output, error) {
 
 SSHRunnerResult:
 	output.ExecEnd = time.Now()
-	if err == nil && output.StdError == "" {
+	output.Err = err
+	if output.Err == nil && output.StdError == "" {
 		output.Status = runner.Success
 	}
-	return output, err
+	return output
+}
+
+// ConcurrentExec execute command sync
+func (sr *SSHRunner) ConcurrentExec(input runner.Input, outputChan chan *runner.ConcurrentOutput, limitChan chan int) {
+	limitChan <- 1
+	var output = sr.SyncExec(input)
+	outputChan <- &runner.ConcurrentOutput{In: input, Out: output}
+	<-limitChan
 }
 
 // authMethods get auth methods

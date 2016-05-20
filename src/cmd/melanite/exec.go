@@ -121,14 +121,16 @@ func execCmd(ep execParams) error {
 	// exec cmd on node
 	if conf.Main.Sync {
 		return syncExecCmd(nodes, ep)
+	} else {
+		return concurrentExecCmd(nodes, ep)
 	}
-	return nil
 }
 
 func syncExecCmd(nodes []model.Node, ep execParams) error {
 	var allOutputs = make([]*runner.Output, 0)
+	var execStart = time.Now()
 	for _, n := range nodes {
-		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
 		var input = runner.Input{
 			ExecHost: n.Host,
@@ -138,19 +140,52 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 		}
 
 		// display result
-		output, err := runCmd.SyncExec(input)
-		displayExecResult(output, err)
-		if output != nil {
-			allOutputs = append(allOutputs, output)
-		}
+		output := runCmd.SyncExec(input)
+		displayExecResult(output)
+		allOutputs = append(allOutputs, output)
 	}
-	displayTotalExecResult(allOutputs)
+	displayTotalExecResult(allOutputs, execStart, time.Now())
 	return nil
 }
 
-func displayExecResult(output *runner.Output, err error) {
-	if err != nil {
-		fmt.Printf("Command exec failed: %s\n", util.FgRed(err))
+func concurrentExecCmd(nodes []model.Node, ep execParams) error {
+	var allOutputs = make([]*runner.Output, 0)
+	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
+	var outputChan = make(chan *runner.ConcurrentOutput)
+
+	var execStart = time.Now()
+	for _, n := range nodes {
+		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var input = runner.Input{
+			ExecHost: n.Host,
+			ExecUser: ep.User,
+			Command:  ep.Cmd,
+			Timeout:  time.Duration(conf.Main.Timeout) * time.Second,
+		}
+
+		// exec comamnd
+		go runCmd.ConcurrentExec(input, outputChan, concurrentLimitChan)
+	}
+
+	var totalCnt = len(nodes)
+	for ch := range outputChan {
+		totalCnt -= 1
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(ch.In.ExecUser), util.FgBoldGreen(ch.In.ExecHost))
+		displayExecResult(ch.Out)
+		allOutputs = append(allOutputs, ch.Out)
+
+		if totalCnt == 0 {
+			close(outputChan)
+		}
+	}
+
+	displayTotalExecResult(allOutputs, execStart, time.Now())
+	return nil
+}
+
+func displayExecResult(output *runner.Output) {
+	if output.Err != nil {
+		fmt.Printf("Command exec failed: %s\n", util.FgRed(output.Err))
 	}
 
 	if output != nil {
@@ -163,9 +198,8 @@ func displayExecResult(output *runner.Output, err error) {
 	fmt.Println(util.FgBoldBlue("==========================================================\n"))
 }
 
-func displayTotalExecResult(outputs []*runner.Output) {
+func displayTotalExecResult(outputs []*runner.Output, execStart, execEnd time.Time) {
 	var successCnt, failCnt, timeoutCnt int
-	var totalCostTime time.Duration
 
 	for _, output := range outputs {
 		switch output.Status {
@@ -176,11 +210,10 @@ func displayTotalExecResult(outputs []*runner.Output) {
 		case runner.Timeout:
 			timeoutCnt += 1
 		}
-		totalCostTime += output.ExecEnd.Sub(output.ExecStart)
 	}
 
-	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s | timeout nodes: %s\n",
-		totalCostTime,
+	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s | timeout nodes: %s\n\n\n",
+		execEnd.Sub(execStart),
 		util.FgBoldGreen(successCnt),
 		util.FgBoldRed(failCnt),
 		util.FgBoldYellow(timeoutCnt))

@@ -5,6 +5,7 @@ import (
 	"os"
 	"runner"
 	"runner/sshrunner"
+	"time"
 
 	"fmt"
 
@@ -107,7 +108,6 @@ func execCmd(ep execParams) error {
 	// TODO should use sshrunner from config
 
 	// get node info for exec
-	repo := GetRepo()
 	var nodes, _ = repo.FilterNodes(ep.GroupName, ep.NodeNames...)
 
 	if len(nodes) == 0 {
@@ -119,71 +119,104 @@ func execCmd(ep execParams) error {
 	}
 
 	// exec cmd on node
+	if conf.Main.Sync {
+		return syncExecCmd(nodes, ep)
+	} else {
+		return concurrentExecCmd(nodes, ep)
+	}
+}
+
+func syncExecCmd(nodes []model.Node, ep execParams) error {
+	var allOutputs = make([]*runner.Output, 0)
+	var execStart = time.Now()
 	for _, n := range nodes {
-		fmt.Printf("Start to excute \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
 		var input = runner.Input{
 			ExecHost: n.Host,
 			ExecUser: ep.User,
 			Command:  ep.Cmd,
+			Timeout:  time.Duration(conf.Main.Timeout) * time.Second,
 		}
 
 		// display result
-		output, err := runCmd.SyncExec(input)
-		displayExecResult(output, err)
+		output := runCmd.SyncExec(input)
+		displayExecResult(output)
+		allOutputs = append(allOutputs, output)
 	}
+	displayTotalExecResult(allOutputs, execStart, time.Now())
 	return nil
 }
 
-func completeGroups() {
-	repo := GetRepo()
+func concurrentExecCmd(nodes []model.Node, ep execParams) error {
+	var allOutputs = make([]*runner.Output, 0)
+	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
+	var outputChan = make(chan *runner.ConcurrentOutput)
 
-	groups, _ := repo.FilterNodeGroups("*")
-	for _, g := range groups {
-		fmt.Println(g.Name)
-	}
-}
-
-func completeNodes(gName string) {
-	repo := GetRepo()
-	nodes, _ := repo.FilterNodes(gName, "*")
+	var execStart = time.Now()
 	for _, n := range nodes {
-		fmt.Println(n.Name)
+		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var input = runner.Input{
+			ExecHost: n.Host,
+			ExecUser: ep.User,
+			Command:  ep.Cmd,
+			Timeout:  time.Duration(conf.Main.Timeout) * time.Second,
+		}
+
+		// exec comamnd
+		go runCmd.ConcurrentExec(input, outputChan, concurrentLimitChan)
 	}
+
+	var totalCnt = len(nodes)
+	for ch := range outputChan {
+		totalCnt -= 1
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(ch.In.ExecUser), util.FgBoldGreen(ch.In.ExecHost))
+		displayExecResult(ch.Out)
+		allOutputs = append(allOutputs, ch.Out)
+
+		if totalCnt == 0 {
+			close(outputChan)
+		}
+	}
+
+	displayTotalExecResult(allOutputs, execStart, time.Now())
+	return nil
 }
 
-func bashComplete(c *cli.Context) {
-	if isAutoComplete(c.String("group")) {
-		completeGroups()
-	}
-	if isAutoComplete(c.String("node")) {
-		completeNodes(c.String("group"))
-	}
-}
-
-func isAutoComplete(curStr string) bool {
-	// --generate-bash-completion is global option for cli
-	// "node" is a multi-option, so framework cli will add [--generate-bash-completion] after -n
-	if curStr == "--generate-bash-completion" ||
-		curStr == "[--generate-bash-completion]" {
-		return true
-	}
-	return false
-}
-
-func displayExecResult(output *runner.Output, err error) {
-	if err != nil {
-		fmt.Printf("Command exec failed: %s\n", util.FgRed(err))
+func displayExecResult(output *runner.Output) {
+	if output.Err != nil {
+		fmt.Printf("Command exec failed: %s\n", util.FgRed(output.Err))
 	}
 
 	if output != nil {
 		fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDOUT >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdOutput)
-		if output.StdError != "" {
+		if output.Status == runner.Fail {
 			fmt.Printf(">>>>>>>>>>>>>>>>>>>> STDERR >>>>>>>>>>>>>>>>>>>>\n%s\n", output.StdError)
 		}
 		fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
 	}
 	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+}
+
+func displayTotalExecResult(outputs []*runner.Output, execStart, execEnd time.Time) {
+	var successCnt, failCnt, timeoutCnt int
+
+	for _, output := range outputs {
+		switch output.Status {
+		case runner.Success:
+			successCnt += 1
+		case runner.Fail:
+			failCnt += 1
+		case runner.Timeout:
+			timeoutCnt += 1
+		}
+	}
+
+	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s | timeout nodes: %s\n\n\n",
+		execEnd.Sub(execStart),
+		util.FgBoldGreen(successCnt),
+		util.FgBoldRed(failCnt),
+		util.FgBoldYellow(timeoutCnt))
 }
 
 func confirmExec(nodes []model.Node, user, cmd string) bool {

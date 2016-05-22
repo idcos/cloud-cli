@@ -48,8 +48,6 @@ func initListSubCmd(app *cli.App) {
 }
 
 func listNodes(groupName, nodeName string, isDisplayAll bool) error {
-	repo := GetRepo()
-
 	var groups, err = repo.FilterNodeGroupsAndNodes(groupName, nodeName)
 	if err != nil {
 		return err

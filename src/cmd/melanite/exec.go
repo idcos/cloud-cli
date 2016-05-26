@@ -60,9 +60,6 @@ func initExecSubCmd(app *cli.App) {
 				Usage: "is confirm before excute command?",
 			},
 		},
-		BashComplete: func(c *cli.Context) {
-			bashComplete(c)
-		},
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
 			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {

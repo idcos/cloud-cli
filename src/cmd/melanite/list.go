@@ -30,13 +30,16 @@ func initListSubCmd(app *cli.App) {
 				Usage: "is list all info about node?",
 			},
 		},
-		Action: func(c *cli.Context) {
+		Action: func(c *cli.Context) error {
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
 			var isDisplayAll = c.Bool("all")
-			if err := listNodes(groupName, nodeName, isDisplayAll); err != nil {
+
+			var err error
+			if err = listNodes(groupName, nodeName, isDisplayAll); err != nil {
 				fmt.Println(err)
 			}
+			return err
 		},
 	}
 

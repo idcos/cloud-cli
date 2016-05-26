@@ -63,21 +63,22 @@ func initExecSubCmd(app *cli.App) {
 		BashComplete: func(c *cli.Context) {
 			bashComplete(c)
 		},
-		Action: func(c *cli.Context) {
+		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
 			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {
 				bashComplete(c)
-				return
+				return nil
 			}
 			var ep, err = checkExecParams(c)
 			if err != nil {
 				fmt.Println(util.FgRed(err))
 				cli.ShowCommandHelp(c, "exec")
-				return
+				return err
 			}
 			if err = execCmd(ep); err != nil {
 				fmt.Println(util.FgRed(err))
 			}
+			return err
 		},
 	}
 

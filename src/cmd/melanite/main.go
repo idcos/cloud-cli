@@ -18,7 +18,7 @@ import (
 	"model/yamlrepo"
 
 	"github.com/astaxie/beego/logs"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var (

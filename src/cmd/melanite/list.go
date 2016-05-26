@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"model"
 
-	"util"
+	"github.com/urfave/cli"
 
-	"github.com/codegangsta/cli"
+	"util"
 )
 
 func initListSubCmd(app *cli.App) {

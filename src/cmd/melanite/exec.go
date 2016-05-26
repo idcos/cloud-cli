@@ -7,11 +7,11 @@ import (
 	"runner/sshrunner"
 	"time"
 
+	"github.com/urfave/cli"
+
 	"fmt"
 
 	"util"
-
-	"github.com/codegangsta/cli"
 )
 
 var (

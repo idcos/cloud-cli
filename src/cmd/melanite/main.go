@@ -47,6 +47,7 @@ func main() {
 
 	initListSubCmd(app)
 	initExecSubCmd(app)
+	initLoginSubCmd(app)
 
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)

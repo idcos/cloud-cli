@@ -8,7 +8,6 @@ import (
 )
 
 func initLoginSubCmd(app *cli.App) {
-
 	loginSubCmd := cli.Command{
 		Name:        "login",
 		Usage:       "login <options>",

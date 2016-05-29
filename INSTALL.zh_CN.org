@@ -48,6 +48,10 @@ logType=console   # 这里支持 console 和 file 2种配置，console：log直�
 [DataSource]
 type=yaml         # 可以远程连接的主机信息，目前只支持 yaml格式
 conn=/path/to/test.yaml  # 存储主机和主机组信息的 yaml 数据源
+
+[CmdAlias]        # 定义常用的命令，用在 exec 子命令的的 -c 参数中
+-: cat /var/log/xxx.log
+-: service nginx restart
 #+END_SRC
 
 存储主机和主机组信息的 yaml 文件示例：

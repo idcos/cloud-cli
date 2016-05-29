@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"runner/sshrunner"
+	"util"
 
 	"github.com/urfave/cli"
 )
@@ -49,6 +51,32 @@ func initLoginSubCmd(app *cli.App) {
 }
 
 func loginNode(groupName, nodeName string) error {
+	// get node info for login
+	var nodes, err = repo.FilterNodes(groupName, nodeName)
+	if err != nil {
+		return err
+	}
+
+	if len(nodes) == 0 {
+		return fmt.Errorf("found No nodes")
+	}
+
+	var n = nodes[0]
+	if len(nodes) > 1 {
+		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "Host")
+		fmt.Println(util.FgBoldBlue("=========================================================="))
+		for index, n := range nodes {
+			fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
+		}
+		var loginNo = util.LoginNo(fmt.Sprintf("Please input the No.(%s<No.<%s) You want to login: ",
+			util.FgBoldRed(0), util.FgBoldRed(len(nodes)+1)),
+			1,
+			len(nodes)+1)
+		n = nodes[loginNo-1]
+	}
+
+	var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+	runCmd.Login(n.Host, conf.Main.LoginShell)
 
 	return nil
 }

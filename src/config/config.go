@@ -9,9 +9,10 @@ type Loader interface {
 // Config config 数据结构体
 type Config struct {
 	Main struct {
-		Sync          bool  `ini:"sync"`
-		ConcurrentNum int   `ini:"concurrentNum"`
-		Timeout       int64 `ini:"timeout"`
+		Sync          bool   `ini:"sync"`
+		ConcurrentNum int    `ini:"concurrentNum"`
+		Timeout       int64  `ini:"timeout"`
+		LoginShell    string `ini:"loginShell"`
 	}
 	Logger struct {
 		Level   string `ini:"level"`

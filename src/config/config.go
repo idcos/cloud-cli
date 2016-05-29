@@ -23,4 +23,5 @@ type Config struct {
 		Type string `ini:"type"`
 		Conn string `ini:"conn"`
 	}
+	CmdAlias map[string]string
 }

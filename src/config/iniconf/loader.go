@@ -47,6 +47,7 @@ func (loader *INILoader) Load() (*config.Config, error) {
 	}
 
 	var conf = new(config.Config)
+	conf.CmdAlias = cfg.Section("CmdAlias").KeysHash()
 	return conf, cfg.MapTo(conf)
 }
 

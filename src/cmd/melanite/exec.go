@@ -91,7 +91,7 @@ func checkExecParams(c *cli.Context) (execParams, error) {
 		GroupName: c.String("group"),
 		NodeNames: c.StringSlice("node"),
 		User:      c.String("user"),
-		Cmd:       c.String("cmd"),
+		Cmd:       convertCmdAlias(c.String("cmd")), // change to real command if input cmd alias
 		Yes:       c.Bool("yes"),
 	}
 
@@ -227,4 +227,18 @@ func confirmExec(nodes []model.Node, user, cmd string) bool {
 	fmt.Println()
 	return util.Confirm(fmt.Sprintf("You want to exec COMMAND(%s) by UESR(%s) at the above nodes, yes/no(y/n) ?",
 		util.FgBoldRed(cmd), util.FgBoldRed(user)))
+}
+
+func convertCmdAlias(cmdNo string) string {
+	var val, ok = conf.CmdAlias[cmdNo]
+	if ok {
+		return val
+	}
+
+	val, ok = conf.CmdAlias["#"+cmdNo]
+	if ok {
+		return val
+	}
+
+	return cmdNo
 }

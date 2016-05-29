@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"runner"
 	"time"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
@@ -126,6 +128,74 @@ func (sr *SSHRunner) ConcurrentExec(input runner.Input, outputChan chan *runner.
 	var output = sr.SyncExec(input)
 	outputChan <- &runner.ConcurrentOutput{In: input, Out: output}
 	<-limitChan
+}
+
+// Login login to remote server
+func (sr *SSHRunner) Login(hostName, shell string) error {
+	var (
+		auth         []ssh.AuthMethod
+		addr         string
+		clientConfig *ssh.ClientConfig
+		client       *ssh.Client
+		session      *ssh.Session
+		err          error
+	)
+
+	// get auth method
+	auth, _ = sr.authMethods()
+
+	clientConfig = &ssh.ClientConfig{
+		User:    sr.User,
+		Auth:    auth,
+		Timeout: 30 * time.Second,
+	}
+
+	// connet to ssh
+	addr = fmt.Sprintf("%s:%d", sr.Host, sr.Port)
+
+	if client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// create session
+	if session, err = client.NewSession(); err != nil {
+		return err
+	}
+	defer session.Close()
+
+	fd := int(os.Stdin.Fd())
+	oldState, err := terminal.MakeRaw(fd)
+	if err != nil {
+		panic(err)
+	}
+	defer terminal.Restore(fd, oldState)
+
+	// excute command
+	session.Stdout = os.Stdout
+	session.Stderr = os.Stderr
+	session.Stdin = os.Stdin
+
+	termWidth, termHeight, err := terminal.GetSize(fd)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set up terminal modes
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          1,     // enable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	// Request pseudo terminal
+	if err := session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
+		return err
+	}
+	if err := session.Run(shell); err != nil {
+		return err
+	}
+	return nil
 }
 
 // authMethods get auth methods

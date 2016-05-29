@@ -38,6 +38,7 @@ melanite 命令支持的子命令和各个参数请参见：[[file:doc/melanite_
 sync=true         # 是否在多个node上并行执行命令  true: 串行执行  false: 并行执行
 concurrentNum=5   # 并发执行的个数，sync=false 时生效
 timeout=10        # 命令执行的timeout时间，单位是秒
+loginShell=/bin/bash # 登录远程机器后使用的shell类型
 
 [Logger]
 level=debug       # log 等级，可以配置  debug，info，warn，error
@@ -47,6 +48,10 @@ logType=console   # 这里支持 console 和 file 2种配置，console：log直�
 [DataSource]
 type=yaml         # 可以远程连接的主机信息，目前只支持 yaml格式
 conn=/path/to/test.yaml  # 存储主机和主机组信息的 yaml 数据源
+
+[CmdAlias]        # 定义常用的命令，用在 exec 子命令的的 -c 参数中
+-: cat /var/log/xxx.log
+-: service nginx restart
 #+END_SRC
 
 存储主机和主机组信息的 yaml 文件示例：

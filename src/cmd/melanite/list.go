@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"model"
+	"os"
 
 	"github.com/urfave/cli"
 
@@ -27,14 +28,19 @@ func initListSubCmd(app *cli.App) {
 			},
 			cli.BoolFlag{
 				Name:  "a,all",
-				Usage: "is list all info about node?",
+				Usage: "is list all info about node? default is NO",
 			},
 		},
 		Action: func(c *cli.Context) error {
+			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
+			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {
+				bashComplete(c)
+				return nil
+			}
+
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
 			var isDisplayAll = c.Bool("all")
-
 			var err error
 			if err = listNodes(groupName, nodeName, isDisplayAll); err != nil {
 				fmt.Println(err)

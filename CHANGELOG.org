@@ -6,6 +6,11 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
+* v0.5.0 版（2016-05-29）
+1. list 自动补全 -g 和 -n 参数
+2. 可以配置常用命令，.melanite 中添加 [CmdAlias] section
+3. 增加 login 子命令，通过 login 可以登录到某台机器的 bash 上去
+
 * v0.4.0 版（2016-05-22）
 1. fix issue#3 多台主机上并行执行命令
 2. 返回结果的统计

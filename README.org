@@ -6,7 +6,7 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite
 
-[[https://api.travis-ci.org/iotalabs/melanite.svg?branch=develop][https://travis-ci.org/iotalabs/melanite]]
+[[https://travis-ci.org/iotalabs/melanite][https://api.travis-ci.org/iotalabs/melanite.svg?branch=develop]]
 
 * 概述
 利用SSH协议，远程执行命令的命令行工具。

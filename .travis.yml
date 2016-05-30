@@ -1,0 +1,10 @@
+language: go
+
+go:
+  - 1.6
+
+install:
+  - go get github.com/constabulary/gb/...
+
+script:
+  - gb test -v

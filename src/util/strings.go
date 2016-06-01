@@ -51,3 +51,12 @@ func ConvertHomeDir(raw string) (string, error) {
 	}
 	return strings.Replace(raw, HomeDirFlag, user.HomeDir, 1), nil
 }
+
+// Trim reomve leading and trailing cutsets of s
+func Trim(s string, cutsets ...string) string {
+	for _, cutset := range cutsets {
+		s = strings.Trim(s, cutset)
+	}
+
+	return s
+}

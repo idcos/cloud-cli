@@ -24,12 +24,16 @@
 
 ** 登录远程机器
 登录远程机器，相当于一个简单的 ssh 客户端。
+
 直接使用命令 ~melanite login~ 时，会在 vim 中列出所有可登录的机器信息，
+
 利用vim的检索功能搜索到某个功能时，直接 Enter 登录。
+
 其中参考了 https://github.com/jpalardy/warp 项目的实现方式。
 
 ** 命令简写
 通过配置文件中 [CmdAlias] section 的配置，定义一些常用的命令，在 exec 子命令的 -c 参数来使用。
+
 示例：以下命令表示执行 [CmdAlias] section 中的第一条命令 （[CmdAlias] section 的配置方法参见 [[file:INSTALL.zh_CN.org::%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E][配置文件说明]]）
 #+BEGIN_SRC sh
 melanite exec -g dgroup01 -n dgnode01 -c 1
@@ -75,11 +79,13 @@ NodeGroups:
 
 ** 命令自动补全
    ZSH 和 BASH 环境下启用自动补全方式是不一样的，启用方式如下：
+
 1. ZSH 环境下
    把下面的代码加入到 .zshrc
    #+BEGIN_SRC sh
    source /path/to/melanite/autocomplete/zsh_completion
    #+END_SRC
+ 
 2. BASH 环境下
    把下面的代码加入到 .bashrc
    #+BEGIN_SRC sh
@@ -89,6 +95,7 @@ NodeGroups:
 补充：
 1. 这2个 completion 脚本在 MacOSX 下已测试可以使用。
    如果在 linux 下使用的话，请修改 bash_completion 中 */usr/local/etc/bash_completion* 的实际位置。
+ 
 2. 使用前安装 bash-completion package，Mac 下安装方式如下：
    #+BEGIN_SRC sh
    brew install bash-completion

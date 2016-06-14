@@ -7,7 +7,7 @@ var iniContent = `
 sync=false
 concurrentNum=5
 timeout=300
-loginShell=/bin/bash
+loginShell="""/bin#/bash"""
 
 [Logger]
 level=debug
@@ -56,7 +56,7 @@ func TestMainSection(t *testing.T) {
 		t.Error("parse Main timeout err")
 	}
 
-	if config.Main.LoginShell != "/bin/bash" {
+	if config.Main.LoginShell != "/bin#/bash" {
 		t.Error("parse Main login shell err")
 	}
 }

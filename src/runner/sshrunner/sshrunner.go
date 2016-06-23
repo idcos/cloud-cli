@@ -31,6 +31,8 @@ type SSHRunner struct {
 	SSHKeyPath string
 	Host       string
 	Port       int
+	client     *ssh.Client
+	session    *ssh.Session
 }
 
 func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
@@ -51,11 +53,6 @@ func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 // SyncExec execute command sync
 func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
 	var (
-		auth           []ssh.AuthMethod
-		addr           string
-		clientConfig   *ssh.ClientConfig
-		client         *ssh.Client
-		session        *ssh.Session
 		err            error
 		output         = &runner.Output{Status: runner.Fail}
 		cmd            = compositCommand(input)
@@ -64,33 +61,14 @@ func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
 	)
 	output.ExecStart = time.Now()
 
-	// get auth method
-	auth, _ = sr.authMethods()
-
-	clientConfig = &ssh.ClientConfig{
-		User:    sr.User,
-		Auth:    auth,
-		Timeout: 30 * time.Second,
-	}
-
-	// connet to ssh
-	addr = fmt.Sprintf("%s:%d", sr.Host, sr.Port)
-
-	if client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
-		output.Status = runner.Timeout
-		goto SSHRunnerResult
-	}
-	defer client.Close()
-
 	// create session
-	if session, err = client.NewSession(); err != nil {
+	if err = sr.createSSHSession(); err != nil {
 		goto SSHRunnerResult
 	}
-	defer session.Close()
+	defer sr.Close()
 
-	// excute command
-	session.Stdout = &stdout
-	session.Stderr = &stderr
+	sr.session.Stdout = &stdout
+	sr.session.Stderr = &stderr
 
 	go func(session *ssh.Session) {
 		if err = session.Start(cmd); err != nil {
@@ -101,7 +79,7 @@ func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
 			errChan <- err
 		}
 		errChan <- nil
-	}(session)
+	}(sr.session)
 
 	select {
 	case err = <-errChan:
@@ -132,37 +110,13 @@ func (sr *SSHRunner) ConcurrentExec(input runner.Input, outputChan chan *runner.
 
 // Login login to remote server
 func (sr *SSHRunner) Login(hostName, shell string) error {
-	var (
-		auth         []ssh.AuthMethod
-		addr         string
-		clientConfig *ssh.ClientConfig
-		client       *ssh.Client
-		session      *ssh.Session
-		err          error
-	)
-
-	// get auth method
-	auth, _ = sr.authMethods()
-
-	clientConfig = &ssh.ClientConfig{
-		User:    sr.User,
-		Auth:    auth,
-		Timeout: 30 * time.Second,
-	}
-
-	// connet to ssh
-	addr = fmt.Sprintf("%s:%d", sr.Host, sr.Port)
-
-	if client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
-		return err
-	}
-	defer client.Close()
+	var err error
 
 	// create session
-	if session, err = client.NewSession(); err != nil {
+	if err = sr.createSSHSession(); err != nil {
 		return err
 	}
-	defer session.Close()
+	defer sr.Close()
 
 	fd := int(os.Stdin.Fd())
 	oldState, err := terminal.MakeRaw(fd)
@@ -172,9 +126,9 @@ func (sr *SSHRunner) Login(hostName, shell string) error {
 	defer terminal.Restore(fd, oldState)
 
 	// excute command
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-	session.Stdin = os.Stdin
+	sr.session.Stdout = os.Stdout
+	sr.session.Stderr = os.Stderr
+	sr.session.Stdin = os.Stdin
 
 	termWidth, termHeight, err := terminal.GetSize(fd)
 	if err != nil {
@@ -189,26 +143,68 @@ func (sr *SSHRunner) Login(hostName, shell string) error {
 	}
 
 	// Request pseudo terminal
-	if err := session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
+	if err := sr.session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
 		return err
 	}
-	if err := session.Run(shell); err != nil {
+	if err := sr.session.Run(shell); err != nil {
 		return err
 	}
 	return nil
 }
 
+func (sr *SSHRunner) Close() {
+	if sr.session != nil {
+		sr.session.Close()
+	}
+
+	if sr.client != nil {
+		sr.client.Close()
+	}
+}
+
+// createSSHSession create session for ssh use
+func (sr *SSHRunner) createSSHSession() error {
+	var (
+		auth         []ssh.AuthMethod
+		addr         string
+		clientConfig *ssh.ClientConfig
+		err          error
+	)
+	// get auth method
+	auth, _ = authMethods(sr.Password, sr.SSHKeyPath)
+
+	clientConfig = &ssh.ClientConfig{
+		User:    sr.User,
+		Auth:    auth,
+		Timeout: 30 * time.Second,
+	}
+
+	// connet to ssh
+	addr = fmt.Sprintf("%s:%d", sr.Host, sr.Port)
+
+	if sr.client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
+		return err
+	}
+
+	// create session
+	if sr.session, err = sr.client.NewSession(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // authMethods get auth methods
-func (sr *SSHRunner) authMethods() ([]ssh.AuthMethod, error) {
+func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
 	var (
 		err         error
 		authkey     []byte
 		signer      ssh.Signer
 		authMethods = make([]ssh.AuthMethod, 0)
 	)
-	authMethods = append(authMethods, ssh.Password(sr.Password))
+	authMethods = append(authMethods, ssh.Password(password))
 
-	if authkey, err = ioutil.ReadFile(sr.SSHKeyPath); err != nil {
+	if authkey, err = ioutil.ReadFile(sshKeyPath); err != nil {
 		return authMethods, err
 	}
 

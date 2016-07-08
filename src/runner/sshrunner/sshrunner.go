@@ -50,54 +50,11 @@ func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 	}
 }
 
+// ==== functions for runner interfaces ====
 // SyncExec execute command sync
 func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
-	var (
-		err            error
-		output         = &runner.Output{Status: runner.Fail}
-		cmd            = compositCommand(input)
-		stdout, stderr bytes.Buffer
-		errChan        = make(chan error)
-	)
-	output.ExecStart = time.Now()
-
-	// create session
-	if err = sr.createSSHSession(); err != nil {
-		goto SSHRunnerResult
-	}
-	defer sr.Close()
-
-	sr.session.Stdout = &stdout
-	sr.session.Stderr = &stderr
-
-	go func(session *ssh.Session) {
-		if err = session.Start(cmd); err != nil {
-			errChan <- err
-		}
-
-		if err = session.Wait(); err != nil {
-			errChan <- err
-		}
-		errChan <- nil
-	}(sr.session)
-
-	select {
-	case err = <-errChan:
-	case <-time.After(input.Timeout):
-		err = fmt.Errorf("exec command(%s) on host(%s) TIMEOUT", input.Command, input.ExecHost)
-		output.Status = runner.Timeout
-	}
-
-	output.StdOutput = string(stdout.Bytes())
-	output.StdError = string(stderr.Bytes())
-
-SSHRunnerResult:
-	output.ExecEnd = time.Now()
-	output.Err = err
-	if output.Err == nil && output.StdError == "" {
-		output.Status = runner.Success
-	}
-	return output
+	var cmd = compositCommand(input)
+	return sr.execNointeractiveCmd(cmd, input.Timeout)
 }
 
 // ConcurrentExec execute command sync
@@ -109,50 +66,14 @@ func (sr *SSHRunner) ConcurrentExec(input runner.Input, outputChan chan *runner.
 }
 
 // Login login to remote server
-func (sr *SSHRunner) Login(hostName, shell string) error {
-	var err error
-
-	// create session
-	if err = sr.createSSHSession(); err != nil {
-		return err
-	}
-	defer sr.Close()
-
-	fd := int(os.Stdin.Fd())
-	oldState, err := terminal.MakeRaw(fd)
-	if err != nil {
-		panic(err)
-	}
-	defer terminal.Restore(fd, oldState)
-
-	// excute command
-	sr.session.Stdout = os.Stdout
-	sr.session.Stderr = os.Stderr
-	sr.session.Stdin = os.Stdin
-
-	termWidth, termHeight, err := terminal.GetSize(fd)
-	if err != nil {
-		panic(err)
-	}
-
-	// Set up terminal modes
-	modes := ssh.TerminalModes{
-		ssh.ECHO:          1,     // enable echoing
-		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
-		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
-	}
-
-	// Request pseudo terminal
-	if err := sr.session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
-		return err
-	}
-	if err := sr.session.Run(shell); err != nil {
-		return err
-	}
-	return nil
+func (sr *SSHRunner) Login(shell string) error {
+	return sr.execInteractiveCmd(shell)
 }
 
-func (sr *SSHRunner) Close() {
+// ==== functions for runner interfaces ====
+
+// ==== funcitons for ssh operation start ====
+func (sr *SSHRunner) close() {
 	if sr.session != nil {
 		sr.session.Close()
 	}
@@ -193,6 +114,99 @@ func (sr *SSHRunner) createSSHSession() error {
 
 	return nil
 }
+
+func (sr *SSHRunner) execNointeractiveCmd(cmd string, timeout time.Duration) *runner.Output {
+	var (
+		err            error
+		output         = &runner.Output{Status: runner.Fail}
+		stdout, stderr bytes.Buffer
+		errChan        = make(chan error)
+	)
+	output.ExecStart = time.Now()
+
+	// create session
+	if err = sr.createSSHSession(); err != nil {
+		goto SSHRunnerResult
+	}
+	defer sr.close()
+
+	sr.session.Stdout = &stdout
+	sr.session.Stderr = &stderr
+
+	go func(session *ssh.Session) {
+		if err = session.Start(cmd); err != nil {
+			errChan <- err
+		}
+
+		if err = session.Wait(); err != nil {
+			errChan <- err
+		}
+		errChan <- nil
+	}(sr.session)
+
+	select {
+	case err = <-errChan:
+	case <-time.After(timeout):
+		err = fmt.Errorf("exec command(%s) on host(%s) TIMEOUT", cmd, sr.Host)
+		output.Status = runner.Timeout
+	}
+
+	output.StdOutput = string(stdout.Bytes())
+	output.StdError = string(stderr.Bytes())
+
+SSHRunnerResult:
+	output.ExecEnd = time.Now()
+	output.Err = err
+	if output.Err == nil && output.StdError == "" {
+		output.Status = runner.Success
+	}
+	return output
+}
+
+func (sr *SSHRunner) execInteractiveCmd(cmd string) error {
+	var err error
+
+	// create session
+	if err = sr.createSSHSession(); err != nil {
+		return err
+	}
+	defer sr.close()
+
+	fd := int(os.Stdin.Fd())
+	oldState, err := terminal.MakeRaw(fd)
+	if err != nil {
+		panic(err)
+	}
+	defer terminal.Restore(fd, oldState)
+
+	// excute command
+	sr.session.Stdout = os.Stdout
+	sr.session.Stderr = os.Stderr
+	sr.session.Stdin = os.Stdin
+
+	termWidth, termHeight, err := terminal.GetSize(fd)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set up terminal modes
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          1,     // enable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	// Request pseudo terminal
+	if err := sr.session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
+		return err
+	}
+	if err := sr.session.Run(cmd); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ==== funcitons for ssh operation start ====
 
 // authMethods get auth methods
 func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {

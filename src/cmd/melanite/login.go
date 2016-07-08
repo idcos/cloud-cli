@@ -84,7 +84,7 @@ func loginNode(groupName, nodeName string) error {
 		nodes[index].Host,
 		nodes[index].Port)
 
-	return runCmd.Login(nodes[index].Host, conf.Main.LoginShell)
+	return runCmd.Login(conf.Main.LoginShell)
 }
 
 // this function has refered https://github.com/jpalardy/warp, thanks jpalardy

@@ -53,5 +53,5 @@ type IRunner interface {
 	// exec command concurrency
 	ConcurrentExec(input Input, outputChan chan *ConcurrentOutput, limitChan chan int)
 	// Login login to remote server
-	Login(hostName, shell string) error
+	Login(shell string) error
 }

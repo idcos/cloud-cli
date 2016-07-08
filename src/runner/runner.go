@@ -38,9 +38,11 @@ type Output struct {
 	Err error
 }
 
-//
+// ConcurrentOutput output for concurrent exec command
 type ConcurrentOutput struct {
-	In  Input
+	// In for confirm the Out is from which node
+	In Input
+	// Out concurrent exec output
 	Out *Output
 }
 

@@ -133,28 +133,6 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 	return nil
 }
 
-// authMethods get auth methods
-func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
-	var (
-		err         error
-		authkey     []byte
-		signer      ssh.Signer
-		authMethods = make([]ssh.AuthMethod, 0)
-	)
-	authMethods = append(authMethods, ssh.Password(password))
-
-	if authkey, err = ioutil.ReadFile(sshKeyPath); err != nil {
-		return authMethods, err
-	}
-
-	if signer, err = ssh.ParsePrivateKey(authkey); err != nil {
-		return authMethods, err
-	}
-
-	authMethods = append(authMethods, ssh.PublicKeys(signer))
-	return authMethods, nil
-}
-
 // createSession create session for ssh use
 func (sc *SSHClient) createSession() error {
 	var (
@@ -185,4 +163,26 @@ func (sc *SSHClient) createSession() error {
 	}
 
 	return nil
+}
+
+// authMethods get auth methods
+func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
+	var (
+		err         error
+		authkey     []byte
+		signer      ssh.Signer
+		authMethods = make([]ssh.AuthMethod, 0)
+	)
+	authMethods = append(authMethods, ssh.Password(password))
+
+	if authkey, err = ioutil.ReadFile(sshKeyPath); err != nil {
+		return authMethods, err
+	}
+
+	if signer, err = ssh.ParsePrivateKey(authkey); err != nil {
+		return authMethods, err
+	}
+
+	authMethods = append(authMethods, ssh.PublicKeys(signer))
+	return authMethods, nil
 }

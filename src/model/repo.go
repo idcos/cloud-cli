@@ -12,8 +12,12 @@ type Node struct {
 
 // NodeGroup store info for node group
 type NodeGroup struct {
-	Name  string `yaml:"GroupName"`
-	Nodes []Node `yaml:"Nodes"`
+	Name     string `yaml:"GroupName"`
+	User     string `yaml:"User"`
+	Password string `yaml:"Password"`
+	KeyPath  string `yaml:"KeyPath"`
+	Port     int    `yaml:"Port"`
+	Nodes    []Node `yaml:"Nodes"`
 }
 
 // IRepo repo interface

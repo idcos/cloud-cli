@@ -79,6 +79,7 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName string, nNames ...string) ([]
 		// only return groups which has nodes
 		if len(filterNodes) > 0 {
 			g.Nodes = filterNodes
+			g = initNodesByGroup(g)
 			filterGroups = append(filterGroups, g)
 		}
 	}
@@ -96,6 +97,7 @@ func (yp *YAMLRepo) FilterNodes(gName string, nNames ...string) ([]model.Node, e
 			continue
 		}
 
+		g = initNodesByGroup(g)
 		for _, n := range g.Nodes {
 			if util.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)
@@ -104,4 +106,30 @@ func (yp *YAMLRepo) FilterNodes(gName string, nNames ...string) ([]model.Node, e
 	}
 
 	return filterNodes, nil
+}
+
+func initNodesByGroup(group model.NodeGroup) model.NodeGroup {
+	if group.Nodes == nil {
+		return group
+	}
+
+	for index, n := range group.Nodes {
+		if n.User == "" {
+			group.Nodes[index].User = group.User
+		}
+
+		if n.Password == "" {
+			group.Nodes[index].Password = group.Password
+		}
+
+		if n.KeyPath == "" {
+			group.Nodes[index].KeyPath = group.KeyPath
+		}
+
+		if n.Port == 0 {
+			group.Nodes[index].Port = group.Port
+		}
+	}
+
+	return group
 }

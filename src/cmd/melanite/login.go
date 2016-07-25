@@ -36,7 +36,7 @@ func initLoginSubCmd(app *cli.App) {
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
 			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {
-				bashComplete(c)
+				groupAndNodeComplete(c)
 				return nil
 			}
 

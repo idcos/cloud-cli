@@ -21,7 +21,7 @@ func completeNodes(gName string) {
 	}
 }
 
-func bashComplete(c *cli.Context) {
+func groupAndNodeComplete(c *cli.Context) {
 	if isAutoComplete(c.String("group")) {
 		completeGroups()
 	}

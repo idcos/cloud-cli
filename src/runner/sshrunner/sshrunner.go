@@ -31,9 +31,9 @@ func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
 }
 
 // SyncExec execute command sync
-func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
+func (sr *SSHRunner) SyncExec(input runner.ExecInput) *runner.ExecOutput {
 	var cmd = compositCommand(input)
-	var output = &runner.Output{Status: runner.Fail}
+	var output = &runner.ExecOutput{Status: runner.Fail}
 
 	output.ExecStart = time.Now()
 	status, stdout, stderr, err := sr.client.ExecNointeractiveCmd(cmd, input.Timeout)
@@ -48,7 +48,7 @@ func (sr *SSHRunner) SyncExec(input runner.Input) *runner.Output {
 }
 
 // ConcurrentExec execute command sync
-func (sr *SSHRunner) ConcurrentExec(input runner.Input, outputChan chan *runner.ConcurrentOutput, limitChan chan int) {
+func (sr *SSHRunner) ConcurrentExec(input runner.ExecInput, outputChan chan *runner.ConcurrentOutput, limitChan chan int) {
 	limitChan <- 1
 	var output = sr.SyncExec(input)
 	outputChan <- &runner.ConcurrentOutput{In: input, Out: output}
@@ -60,6 +60,12 @@ func (sr *SSHRunner) Login(shell string) error {
 	return sr.client.ExecInteractiveCmd(shell)
 }
 
-func compositCommand(input runner.Input) string {
+// SyncRcp copy file to remote server sync
+func (sr *SSHRunner) SyncRcp(input runner.RcpInput) *runner.RcpOutput {
+
+	return nil
+}
+
+func compositCommand(input runner.ExecInput) string {
 	return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
 }

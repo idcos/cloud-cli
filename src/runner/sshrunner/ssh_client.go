@@ -137,13 +137,11 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 func (sc *SSHClient) Put(localPath, remotePath string) error {
 	var err error
 
-	// remote path is exist or not
-
 	return err
 }
 
 // Get transfer file/directory from remote server
-func (sc *SSHClient) Get(localPaht, remotePath string) error {
+func (sc *SSHClient) Get(localPath, remotePath string) error {
 	var err error
 
 	return err

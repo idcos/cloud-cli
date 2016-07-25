@@ -38,7 +38,7 @@ func initRcpSubCmd(app *cli.App) {
 			cli.StringFlag{
 				Name:  "dst",
 				Value: "",
-				Usage: "destination file or directory",
+				Usage: "destination *directory*",
 			},
 			cli.StringFlag{
 				Name:  "g,group",
@@ -74,7 +74,7 @@ func initRcpSubCmd(app *cli.App) {
 			cli.StringFlag{
 				Name:  "src",
 				Value: "",
-				Usage: "source file or directory",
+				Usage: "source *directory*",
 			},
 			cli.StringFlag{
 				Name:  "dst",

@@ -47,3 +47,10 @@ func DirExist(dirpath string) bool {
 
 	return (err == nil || os.IsExist(err)) && fi.IsDir()
 }
+
+// IsDir is directory or not
+func IsDir(filepath string) bool {
+	fi, err := os.Stat(filepath)
+
+	return err == nil && fi.IsDir()
+}

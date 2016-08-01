@@ -2,7 +2,12 @@ package main
 
 import (
 	"fmt"
+	"model"
 	"os"
+	"runner"
+	"runner/sshrunner"
+	"time"
+
 	"util"
 
 	"github.com/urfave/cli"
@@ -13,6 +18,8 @@ var (
 	ErrSrcRequired = fmt.Errorf("option --src is required")
 	// ErrDstRequired require dst option
 	ErrDstRequired = fmt.Errorf("option --dst is required")
+	// ErrNoNodeToRcp no more node to execute
+	ErrNoNodeToRcp = fmt.Errorf("found no node to copy file/directory")
 )
 
 type rcpParams struct {
@@ -21,6 +28,7 @@ type rcpParams struct {
 	User      string
 	Src       string
 	Dst       string
+	Yes       bool
 }
 
 func initRcpSubCmd(app *cli.App) {
@@ -55,6 +63,10 @@ func initRcpSubCmd(app *cli.App) {
 				Value: "root",
 				Usage: "user who exec the command",
 			},
+			cli.BoolFlag{
+				Name:  "y,yes",
+				Usage: "is confirm before excute command?",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
@@ -62,6 +74,17 @@ func initRcpSubCmd(app *cli.App) {
 				groupAndNodeComplete(c)
 				return nil
 			}
+
+			var rp, err = checkRcpParams(c)
+			if err != nil {
+				fmt.Println(util.FgRed(err))
+				cli.ShowCommandHelp(c, "put")
+				return err
+			}
+			if err = rcpCmd(rp, true); err != nil {
+				fmt.Println(util.FgRed(err))
+			}
+
 			return nil
 		},
 	}
@@ -96,6 +119,10 @@ func initRcpSubCmd(app *cli.App) {
 				Value: "root",
 				Usage: "user who exec the command",
 			},
+			cli.BoolFlag{
+				Name:  "y,yes",
+				Usage: "is confirm before excute command?",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
@@ -107,10 +134,10 @@ func initRcpSubCmd(app *cli.App) {
 			var rp, err = checkRcpParams(c)
 			if err != nil {
 				fmt.Println(util.FgRed(err))
-				cli.ShowCommandHelp(c, "exec")
+				cli.ShowCommandHelp(c, "get")
 				return err
 			}
-			if err = rcpCmd(rp); err != nil {
+			if err = rcpCmd(rp, false); err != nil {
 				fmt.Println(util.FgRed(err))
 			}
 
@@ -132,6 +159,7 @@ func checkRcpParams(c *cli.Context) (rcpParams, error) {
 		User:      c.String("user"),
 		Src:       c.String("src"),
 		Dst:       c.String("dst"),
+		Yes:       c.Bool("yes"),
 	}
 
 	if rp.Dst == "" {
@@ -145,7 +173,87 @@ func checkRcpParams(c *cli.Context) (rcpParams, error) {
 	return rp, nil
 }
 
-func rcpCmd(rp rcpParams) error {
+func rcpCmd(rp rcpParams, isPut bool) error {
+	// TODO should use sshrunner from config
 
+	// get node info for exec
+	var nodes, _ = repo.FilterNodes(rp.GroupName, rp.NodeNames...)
+
+	if len(nodes) == 0 {
+		return ErrNoNodeToRcp
+	}
+
+	if !rp.Yes && !confirmRcp(nodes, rp.User, rp.Src, rp.Dst) {
+		return nil
+	}
+
+	// exec cmd on node
+	if conf.Main.Sync {
+		// TODO copy file concurrency
+		return nil
+	} else {
+		return syncRcp(nodes, rp, isPut)
+	}
 	return nil
+}
+
+func confirmRcp(nodes []model.Node, user, from, to string) bool {
+	fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "Host")
+	fmt.Println("----------------------------------------------------------------------")
+	for index, n := range nodes {
+		fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
+	}
+
+	fmt.Println()
+	return util.Confirm(fmt.Sprintf("You want to copy [%s] to [%s] by UESR(%s) at the above nodes, yes/no(y/n) ?",
+		util.FgBoldRed(from), util.FgBoldRed(to), util.FgBoldRed(user)))
+}
+
+func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
+	var allOutputs = make([]*runner.RcpOutput, 0)
+	var execStart = time.Now()
+	for _, n := range nodes {
+		fmt.Printf("%s(%s):\n", util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		var sftpClient = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+
+		var input = runner.RcpInput{
+			SrcPath: rp.Src,
+			DstPath: rp.Dst,
+			RcpHost: n.Host,
+			RcpUser: rp.User,
+		}
+
+		// display result
+		output := sftpClient.SyncPut(input)
+		displayRcpResult(output)
+		allOutputs = append(allOutputs, output)
+	}
+	displayTotalRcpResult(allOutputs, execStart, time.Now())
+	return nil
+}
+
+func displayRcpResult(output *runner.RcpOutput) {
+	if output.Err != nil {
+		fmt.Printf("copy file/directory failed: %s\n", util.FgRed(output.Err))
+	}
+
+	fmt.Printf("time costs: %v\n", output.RcpEnd.Sub(output.RcpStart))
+	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+}
+
+func displayTotalRcpResult(outputs []*runner.RcpOutput, rcpStart, rcpEnd time.Time) {
+	var successCnt, failCnt int
+
+	for _, output := range outputs {
+		if output.Err != nil {
+			failCnt += 1
+		} else {
+			successCnt += 1
+		}
+	}
+
+	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s\n\n\n",
+		rcpEnd.Sub(rcpStart),
+		util.FgBoldGreen(successCnt),
+		util.FgBoldRed(failCnt))
 }

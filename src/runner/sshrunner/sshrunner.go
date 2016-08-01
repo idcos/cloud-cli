@@ -13,11 +13,6 @@ const (
 	authTypeKey string = "KEY"
 )
 
-var (
-	// ErrInvalidAuthType error message for invalid auth type
-	ErrInvalidAuthType = "Invalid auth type : %s\n"
-)
-
 // SSHRunner execute command by ssh
 type SSHRunner struct {
 	client *SSHClient
@@ -60,10 +55,16 @@ func (sr *SSHRunner) Login(shell string) error {
 	return sr.client.ExecInteractiveCmd(shell)
 }
 
-// SyncRcp copy file to remote server sync
-func (sr *SSHRunner) SyncRcp(input runner.RcpInput) *runner.RcpOutput {
+// SyncPut copy file to remote server sync
+func (sr *SSHRunner) SyncPut(input runner.RcpInput) *runner.RcpOutput {
+	rcpStart := time.Now()
+	err := sr.client.Put(input.SrcPath, input.DstPath)
 
-	return nil
+	return &runner.RcpOutput{
+		RcpStart: rcpStart,
+		RcpEnd:   time.Now(),
+		Err:      err,
+	}
 }
 
 func compositCommand(input runner.ExecInput) string {

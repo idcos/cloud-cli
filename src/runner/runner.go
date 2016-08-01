@@ -40,15 +40,13 @@ type ExecOutput struct {
 
 type RcpInput struct {
 	// LocalPath local path for file or directory
-	LocalPath string
+	SrcPath string
 	// RemotePath remote path for file or directory
-	RemotePath string
+	DstPath string
 	// RcpHost remote host
 	RcpHost string
 	// RcpUser remote user
 	RcpUser string
-	// IsPut put or get file/directory from/to remote server
-	IsPut bool
 }
 
 type RcpOutput struct {
@@ -76,7 +74,7 @@ type IRunner interface {
 	ConcurrentExec(input ExecInput, outputChan chan *ConcurrentOutput, limitChan chan int)
 	// Login login to remote server
 	Login(shell string) error
-	// SyncRcp copy file to remote server sync
-	SyncRcp(input RcpInput) *RcpOutput
+	// SyncPut copy file to remote server sync
+	SyncPut(input RcpInput) *RcpOutput
 	// ConcurrentRcp copy file to remote server concurrency
 }

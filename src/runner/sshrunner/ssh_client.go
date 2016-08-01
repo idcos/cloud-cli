@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runner"
 	"time"
+
+	"github.com/pkg/sftp"
+
+	"path"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -20,6 +25,7 @@ type SSHClient struct {
 	Port       int
 	client     *ssh.Client
 	session    *ssh.Session
+	sftpClient *sftp.Client
 }
 
 func NewSSHClient(user, password, sshKeyPath, host string, port int) *SSHClient {
@@ -135,9 +141,31 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 
 // Put transfer file/directory to remote server
 func (sc *SSHClient) Put(localPath, remotePath string) error {
-	var err error
+	var (
+		err           error
+		localFileInfo os.FileInfo
+	)
 
-	return err
+	// create client
+	if err = sc.createClient(); err != nil {
+		return err
+	}
+	sc.sftpClient, err = sftp.NewClient(sc.client)
+	if err != nil {
+		return err
+	}
+	defer sc.sftpClient.Close()
+
+	localFileInfo, err = os.Stat(localPath)
+	if err != nil {
+		return err
+	}
+
+	if localFileInfo.IsDir() { // localPath is directory
+		return putDir(sc.sftpClient, localPath, remotePath)
+	} else { // localPath is file
+		return putFile(sc.sftpClient, localPath, remotePath)
+	}
 }
 
 // Get transfer file/directory from remote server
@@ -147,8 +175,8 @@ func (sc *SSHClient) Get(localPath, remotePath string) error {
 	return err
 }
 
-// createSession create session for ssh use
-func (sc *SSHClient) createSession() error {
+// createClient create ssh client
+func (sc *SSHClient) createClient() error {
 	var (
 		auth         []ssh.AuthMethod
 		addr         string
@@ -168,6 +196,17 @@ func (sc *SSHClient) createSession() error {
 	addr = fmt.Sprintf("%s:%d", sc.Host, sc.Port)
 
 	if sc.client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
+		return err
+	}
+	return nil
+}
+
+// createSession create session for ssh use
+func (sc *SSHClient) createSession() error {
+	var err error
+
+	// create client
+	if err = sc.createClient(); err != nil {
 		return err
 	}
 
@@ -199,4 +238,66 @@ func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
 
 	authMethods = append(authMethods, ssh.PublicKeys(signer))
 	return authMethods, nil
+}
+
+func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
+	filename := path.Base(localPath)
+	srcFile, err := os.Open(localPath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := sftpClient.Create(path.Join(remoteDir, filename))
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	buf := make([]byte, 1024)
+	for {
+		n, _ := srcFile.Read(buf)
+		if n == 0 {
+			break
+		}
+		dstFile.Write(buf)
+	}
+
+	return nil
+}
+
+func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
+
+	return filepath.Walk(localDir, func(localPath string, info os.FileInfo, err error) error {
+		relPath, err := filepath.Rel(localDir, localPath)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			// if the remote directory is existed, then omit create it
+			isExisted := isRemoteDirExisted(sftpClient, path.Join(remoteDir, relPath))
+			if err != nil {
+				return err
+			}
+
+			if !isExisted {
+				return sftpClient.Mkdir(path.Join(remoteDir, relPath))
+			} else {
+				return nil
+			}
+
+		} else {
+			return putFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)))
+		}
+	})
+}
+
+func isRemoteDirExisted(sftpClient *sftp.Client, remoteDir string) bool {
+	remoteFileInfo, err := sftpClient.Stat(remoteDir)
+	if err != nil {
+		return false
+	}
+
+	return remoteFileInfo.IsDir()
 }

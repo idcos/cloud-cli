@@ -21,6 +21,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/kr/fs",
+			"repository": "https://github.com/kr/fs",
+			"revision": "2788f0dbd16903de03cb8186e5c7d97b69ad387b",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/mattn/go-colorable",
 			"repository": "https://github.com/mattn/go-colorable",
 			"revision": "bc69d6cebca8dd5675346a34a1c545b67dc74d5e",
@@ -30,6 +36,18 @@
 			"importpath": "github.com/mattn/go-isatty",
 			"repository": "https://github.com/mattn/go-isatty",
 			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/pkg/errors",
+			"repository": "https://github.com/pkg/errors",
+			"revision": "a2d6902c6d2a2f194eb3fb474981ab7867c81505",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/pkg/sftp",
+			"repository": "https://github.com/pkg/sftp",
+			"revision": "a71e8f580e3b622ebff585309160b1cc549ef4d2",
 			"branch": "master"
 		},
 		{

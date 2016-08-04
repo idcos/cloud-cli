@@ -7,6 +7,9 @@
 #+TITLE: Melanite
 
 [[https://travis-ci.org/iotalabs/melanite][https://api.travis-ci.org/iotalabs/melanite.svg?branch=develop]]
+[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/language-Go-orange.svg]]
+[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/copyright-Iota%20Labs-red.svg]]
+[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/license-MIT-blue.svg]]
 
 * 概述
 利用SSH协议，远程执行命令的命令行工具。
@@ -25,8 +28,20 @@
 ** 登录远程机器
 登录远程机器，相当于一个简单的 ssh 客户端。
 
+直接使用命令 ~melanite login~ 时，会在 vim 中列出所有可登录的机器信息，
+
+利用vim的检索功能搜索到某个功能时，直接 Enter 登录。
+
+其中参考了 https://github.com/jpalardy/warp 项目的实现方式。
+
+** 远程传输文件
+传输 文件/文件夹 到多台机器，获取结果并显示。
+ 
+从 某台远程机器上 的 文件/文件夹。
+ 
 ** 命令简写
 通过配置文件中 [CmdAlias] section 的配置，定义一些常用的命令，在 exec 子命令的 -c 参数来使用。
+
 示例：以下命令表示执行 [CmdAlias] section 中的第一条命令 （[CmdAlias] section 的配置方法参见 [[file:INSTALL.zh_CN.org::%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E][配置文件说明]]）
 #+BEGIN_SRC sh
 melanite exec -g dgroup01 -n dgnode01 -c 1
@@ -44,39 +59,40 @@ melanite exec -g dgroup01 -n dgnode01 -c '#1'
 #+BEGIN_SRC yaml
 NodeGroups:
     - GroupName: group001
+      Port: 22
+      User: testuser
+      Password: testtest
+      KeyPath: /home/user/.ssh/private-key
       Nodes:
           - Name: golang
             Host: 192.168.1.1
-            Port: 22
-            User: user
-            Password: password
           - Name: python
             Host: 192.168.1.2
-            Port: 22
-            User: root
-            Password: rootpass
 
     - GroupName: group002
+      Port: 22
       Nodes:
           - Name: elixir-lang
             Host: 10.0.0.1
-            Port: 22
             User: testuser
             Password: testtest
           - Name: elm-lang
             Host: elm-lang.cn
-            Port: 22
             User: root
             KeyPath: /home/user/.ssh/private-key
 #+END_SRC
 
+可以在主机组上设置默认的 *User* *Password* *KeyPath* *Port* ，这样，主机（Node）如果没有设置 *User* *Password* *KeyPath* *Port* ，就使用所属主机组的默认设置。
+
 ** 命令自动补全
    ZSH 和 BASH 环境下启用自动补全方式是不一样的，启用方式如下：
+
 1. ZSH 环境下
    把下面的代码加入到 .zshrc
    #+BEGIN_SRC sh
    source /path/to/melanite/autocomplete/zsh_completion
    #+END_SRC
+ 
 2. BASH 环境下
    把下面的代码加入到 .bashrc
    #+BEGIN_SRC sh
@@ -86,6 +102,7 @@ NodeGroups:
 补充：
 1. 这2个 completion 脚本在 MacOSX 下已测试可以使用。
    如果在 linux 下使用的话，请修改 bash_completion 中 */usr/local/etc/bash_completion* 的实际位置。
+ 
 2. 使用前安装 bash-completion package，Mac 下安装方式如下：
    #+BEGIN_SRC sh
    brew install bash-completion

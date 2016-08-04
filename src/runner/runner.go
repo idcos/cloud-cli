@@ -10,8 +10,8 @@ const (
 	Timeout OutputStaus = "timeout"
 )
 
-// Input input format for runner interface
-type Input struct {
+// ExecInput input format for runner interface
+type ExecInput struct {
 	// ExecUser username for exec command
 	ExecUser string
 	// ExecHost hostname for exec command
@@ -22,8 +22,8 @@ type Input struct {
 	Timeout time.Duration
 }
 
-// Output output format for runner interface
-type Output struct {
+// ExecOutput output format for runner interface
+type ExecOutput struct {
 	// Status for exec result
 	Status OutputStaus
 	// StdError error output for exec result
@@ -38,18 +38,45 @@ type Output struct {
 	Err error
 }
 
-//
+type RcpInput struct {
+	// LocalPath local path for file or directory
+	SrcPath string
+	// RemotePath remote path for file or directory
+	DstPath string
+	// RcpHost remote host
+	RcpHost string
+	// RcpUser remote user
+	RcpUser string
+}
+
+type RcpOutput struct {
+	// RcpStart start time when exec command
+	RcpStart time.Time
+	// RcpEnd end time when exec command
+	RcpEnd time.Time
+	// Err error info about exec command
+	Err error
+}
+
+// ConcurrentOutput output for concurrent exec command
 type ConcurrentOutput struct {
-	In  Input
-	Out *Output
+	// In for confirm the Out is from which node
+	In ExecInput
+	// Out concurrent exec output
+	Out *ExecOutput
 }
 
 // IRunner runner interface
 type IRunner interface {
-	// exec command sync
-	SyncExec(input Input) *Output
-	// exec command concurrency
-	ConcurrentExec(input Input, outputChan chan *ConcurrentOutput, limitChan chan int)
+	// SyncExec exec command sync
+	SyncExec(input ExecInput) *ExecOutput
+	// ConcurrentExec exec command concurrency
+	ConcurrentExec(input ExecInput, outputChan chan *ConcurrentOutput, limitChan chan int)
 	// Login login to remote server
-	Login(hostName, shell string) error
+	Login(shell string) error
+	// SyncPut copy file to remote server sync
+	SyncPut(input RcpInput) *RcpOutput
+	// SyncGet copy file from remote server sync
+	SyncGet(input RcpInput) *RcpOutput
+	// ConcurrentRcp copy file to remote server concurrency
 }

@@ -63,7 +63,7 @@ func initExecSubCmd(app *cli.App) {
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令
 			if os.Args[len(os.Args)-1] == "--generate-bash-completion" {
-				bashComplete(c)
+				groupAndNodeComplete(c)
 				return nil
 			}
 			var ep, err = checkExecParams(c)
@@ -125,12 +125,12 @@ func execCmd(ep execParams) error {
 }
 
 func syncExecCmd(nodes []model.Node, ep execParams) error {
-	var allOutputs = make([]*runner.Output, 0)
+	var allOutputs = make([]*runner.ExecOutput, 0)
 	var execStart = time.Now()
 	for _, n := range nodes {
 		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
-		var input = runner.Input{
+		var input = runner.ExecInput{
 			ExecHost: n.Host,
 			ExecUser: ep.User,
 			Command:  ep.Cmd,
@@ -147,14 +147,14 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 }
 
 func concurrentExecCmd(nodes []model.Node, ep execParams) error {
-	var allOutputs = make([]*runner.Output, 0)
+	var allOutputs = make([]*runner.ExecOutput, 0)
 	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
 	var outputChan = make(chan *runner.ConcurrentOutput)
 
 	var execStart = time.Now()
 	for _, n := range nodes {
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
-		var input = runner.Input{
+		var input = runner.ExecInput{
 			ExecHost: n.Host,
 			ExecUser: ep.User,
 			Command:  ep.Cmd,
@@ -181,7 +181,7 @@ func concurrentExecCmd(nodes []model.Node, ep execParams) error {
 	return nil
 }
 
-func displayExecResult(output *runner.Output) {
+func displayExecResult(output *runner.ExecOutput) {
 	if output.Err != nil {
 		fmt.Printf("Command exec failed: %s\n", util.FgRed(output.Err))
 	}
@@ -196,7 +196,7 @@ func displayExecResult(output *runner.Output) {
 	fmt.Println(util.FgBoldBlue("==========================================================\n"))
 }
 
-func displayTotalExecResult(outputs []*runner.Output, execStart, execEnd time.Time) {
+func displayTotalExecResult(outputs []*runner.ExecOutput, execStart, execEnd time.Time) {
 	var successCnt, failCnt, timeoutCnt int
 
 	for _, output := range outputs {

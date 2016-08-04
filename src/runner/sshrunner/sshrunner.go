@@ -67,6 +67,18 @@ func (sr *SSHRunner) SyncPut(input runner.RcpInput) *runner.RcpOutput {
 	}
 }
 
+// SyncGet copy file from remote server sync
+func (sr *SSHRunner) SyncGet(input runner.RcpInput) *runner.RcpOutput {
+	rcpStart := time.Now()
+	err := sr.client.Get(input.DstPath, input.SrcPath)
+
+	return &runner.RcpOutput{
+		RcpStart: rcpStart,
+		RcpEnd:   time.Now(),
+		Err:      err,
+	}
+}
+
 func compositCommand(input runner.ExecInput) string {
 	return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
 }

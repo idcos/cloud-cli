@@ -224,7 +224,12 @@ func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 		}
 
 		// display result
-		output := sftpClient.SyncPut(input)
+		var output *runner.RcpOutput
+		if isPut {
+			output = sftpClient.SyncPut(input)
+		} else {
+			output = sftpClient.SyncGet(input)
+		}
 		displayRcpResult(output)
 		allOutputs = append(allOutputs, output)
 	}

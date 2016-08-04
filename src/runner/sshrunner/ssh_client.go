@@ -17,6 +17,10 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var (
+	ErrLocalPathIsFile = "local path cannot be a file when remote path is directory"
+)
+
 type SSHClient struct {
 	User       string
 	Password   string
@@ -170,7 +174,30 @@ func (sc *SSHClient) Put(localPath, remotePath string) error {
 
 // Get transfer file/directory from remote server
 func (sc *SSHClient) Get(localPath, remotePath string) error {
-	var err error
+	var (
+		err            error
+		remoteFileInfo os.FileInfo
+	)
+
+	// create client
+	if err = sc.createClient(); err != nil {
+		return err
+	}
+	sc.sftpClient, err = sftp.NewClient(sc.client)
+	if err != nil {
+		return err
+	}
+	defer sc.sftpClient.Close()
+
+	if remoteFileInfo, err = sc.sftpClient.Stat(remotePath); err != nil {
+		return err
+	}
+
+	if remoteFileInfo.IsDir() {
+		return getDir(sc.sftpClient, localPath, remotePath)
+	} else {
+		return getFile(sc.sftpClient, localPath, remotePath)
+	}
 
 	return err
 }
@@ -300,4 +327,59 @@ func isRemoteDirExisted(sftpClient *sftp.Client, remoteDir string) bool {
 	}
 
 	return remoteFileInfo.IsDir()
+}
+
+func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
+
+	srcFile, err := sftpClient.Open(remoteFile)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	// localPath is directory, then localFile's name == remoteFile's name
+	localFileInfo, err := os.Stat(localPath)
+	if err == nil && localFileInfo.IsDir() {
+		localPath = path.Join(localPath, path.Base(remoteFile))
+	}
+
+	dstFile, err := os.Create(localPath)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = srcFile.WriteTo(dstFile)
+	return err
+}
+
+func getDir(sftpClient *sftp.Client, localPath, remoteDir string) error {
+	localFileInfo, err := os.Stat(localPath)
+	// remotepath is directory, localPath existed and be a file, cause error
+	if err == nil && !localFileInfo.IsDir() {
+		return fmt.Errorf(ErrLocalPathIsFile)
+	}
+
+	w := sftpClient.Walk(remoteDir)
+	for w.Step() {
+		if err = w.Err(); err != nil {
+			return err
+		}
+
+		relRemotePath, err := filepath.Rel(remoteDir, w.Path())
+		if err != nil {
+			return err
+		}
+		if w.Stat().IsDir() {
+			if err = os.MkdirAll(path.Join(localPath, relRemotePath), os.ModePerm); err != nil {
+				return err
+			}
+		} else {
+			if err = getFile(sftpClient, path.Join(localPath, relRemotePath), w.Path()); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

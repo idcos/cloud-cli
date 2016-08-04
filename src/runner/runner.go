@@ -76,5 +76,7 @@ type IRunner interface {
 	Login(shell string) error
 	// SyncPut copy file to remote server sync
 	SyncPut(input RcpInput) *RcpOutput
+	// SyncGet copy file from remote server sync
+	SyncGet(input RcpInput) *RcpOutput
 	// ConcurrentRcp copy file to remote server concurrency
 }

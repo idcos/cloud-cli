@@ -79,3 +79,42 @@ OPTIONS:
    -n value, --node value       the node you want to login (default: "*")
 #+END_EXAMPLE
 
+* subcommand _put_
+#+BEGIN_EXAMPLE
+NAME:
+   melanite put - put <options>
+
+USAGE:
+   melanite put [command options] [arguments...]
+
+DESCRIPTION:
+   copy file or directory to remote servers
+
+OPTIONS:
+   --src value                  source file or directory
+   --dst value                  destination *directory*
+   -g value, --group value      exec command on one group (default: "*")
+   -n value, --node value       exec command on one or more nodes
+   -u value, --user value       user who exec the command (default: "root")
+   -y, --yes                    is confirm before excute command?
+#+END_EXAMPLE
+
+* subcommand _get_
+#+BEGIN_EXAMPLE
+NAME:
+   melanite get - get <options>
+
+USAGE:
+   melanite get [command options] [arguments...]
+
+DESCRIPTION:
+   copy file or directory from remote servers
+
+OPTIONS:
+   --src value                  source *directory*
+   --dst value                  destination file or directory
+   -g value, --group value      exec command on one group (default: "*")
+   -n value, --node value       exec command on one or more nodes
+   -u value, --user value       user who exec the command (default: "root")
+   -y, --yes                    is confirm before excute command?
+#+END_EXAMPLE

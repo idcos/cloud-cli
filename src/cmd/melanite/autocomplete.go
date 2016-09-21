@@ -24,10 +24,10 @@ func completeNodes(gName string) {
 func groupAndNodeComplete(c *cli.Context) {
 	if isAutoComplete(c.String("group")) {
 		completeGroups()
-	}
-	if isAutoComplete(c.String("node")) {
+	} else if isAutoComplete(c.String("node")) {
 		completeNodes(c.String("group"))
 	}
+
 }
 
 func isAutoComplete(curStr string) bool {

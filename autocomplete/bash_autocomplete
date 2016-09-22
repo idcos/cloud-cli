@@ -1,15 +1,25 @@
 #! /bin/bash
 
-/bin/bash /usr/local/etc/bash_completion
+. /usr/local/etc/bash_completion
 
 _cli_bash_autocomplete() {
-     local cur opts
      COMPREPLY=()
-     cur="${COMP_WORDS[COMP_CWORD]}"
+     local cur prev opts
+     _get_comp_words_by_ref cur prev
+
      opts=$( ${COMP_WORDS[@]:0:$COMP_CWORD} --generate-bash-completion )
+
+     # do not display error info when opt is not exist
      if [ "$?" != 0 ]; then
          return $?
      fi
+
+     # complete file or dir after --src/--dst
+     if [ "$prev" == "--src" -o "$prev" == "--dst" ]; then
+         _filedir
+         return 0
+     fi
+
      COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
      return 0
  }

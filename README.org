@@ -88,10 +88,14 @@ NodeGroups:
    ZSH 和 BASH 环境下启用自动补全方式是不一样的，启用方式如下：
 
 1. ZSH 环境下
-   把下面的代码加入到 .zshrc
-   #+BEGIN_SRC sh
-   source /path/to/melanite/autocomplete/zsh_completion
-   #+END_SRC
+   - 找到 zsh 的 $fpath
+     #+BEGIN_SRC sh
+     echo $fpath
+     #+END_SRC
+   - 在 上述的路径之一中，创建连接 自动补全脚本的软链接（或者直接将自动补全脚本放入上面的任一路径之中）
+     #+BEGIN_SRC sh
+     ln -s /path/of/fpath/_melanite /path/to/melanite/autocomplete/_melanite
+     #+END_SRC
  
 2. BASH 环境下
    把下面的代码加入到 .bashrc

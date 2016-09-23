@@ -16,6 +16,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+var loginOptions = []string{"-g", "--group", "-n", "--node"}
+
 func initLoginSubCmd(app *cli.App) {
 	loginSubCmd := cli.Command{
 		Name:        "login",
@@ -32,6 +34,11 @@ func initLoginSubCmd(app *cli.App) {
 				Value: "*",
 				Usage: "the node you want to login",
 			},
+		},
+		BashComplete: func(c *cli.Context) {
+			for _, opt := range loginOptions {
+				fmt.Println(opt)
+			}
 		},
 		Action: func(c *cli.Context) error {
 			// 如果有 --generate-bash-completion 参数, 则不执行默认命令

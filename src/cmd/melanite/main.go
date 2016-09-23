@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version  = "v0.6.0"
+	version  = "v0.6.1"
 	confPath = ".melanite.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger
@@ -52,6 +52,7 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 

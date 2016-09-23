@@ -24,15 +24,14 @@ func completeNodes(gName string) {
 func groupAndNodeComplete(c *cli.Context) {
 	if isAutoComplete(c.String("group")) {
 		completeGroups()
-	}
-	if isAutoComplete(c.String("node")) {
+	} else if isAutoComplete(c.String("node")) {
 		completeNodes(c.String("group"))
 	}
 }
 
 func isAutoComplete(curStr string) bool {
 	// --generate-bash-completion is global option for cli
-	// "node" is a multi-option, so framework cli will add [--generate-bash-completion] after -n
+	// ex. "node" is a multi-option, so framework cli will add [--generate-bash-completion] after -n
 	if strings.Contains(curStr, "--generate-bash-completion") {
 		return true
 	}

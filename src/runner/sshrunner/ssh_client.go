@@ -275,6 +275,11 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
 	}
 	defer srcFile.Close()
 
+	// create remote dir
+	if err := mkRemoteDirs(sftpClient, remoteDir); err != nil {
+		return err
+	}
+
 	dstFile, err := sftpClient.Create(path.Join(remoteDir, filename))
 	if err != nil {
 		return err
@@ -303,17 +308,10 @@ func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
 
 		if info.IsDir() {
 			// if the remote directory is existed, then omit create it
-			isExisted := isRemoteDirExisted(sftpClient, path.Join(remoteDir, relPath))
-			if err != nil {
+			if err := mkRemoteDirs(sftpClient, path.Join(remoteDir, relPath)); err != nil {
 				return err
 			}
-
-			if !isExisted {
-				return sftpClient.Mkdir(path.Join(remoteDir, relPath))
-			} else {
-				return nil
-			}
-
+			return nil
 		} else {
 			return putFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)))
 		}
@@ -322,11 +320,22 @@ func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
 
 func isRemoteDirExisted(sftpClient *sftp.Client, remoteDir string) bool {
 	remoteFileInfo, err := sftpClient.Stat(remoteDir)
+	// TODO error type is "not found file or directory"
 	if err != nil {
 		return false
 	}
 
 	return remoteFileInfo.IsDir()
+}
+
+func mkRemoteDirs(sftpClient *sftp.Client, remoteDir string) error {
+	// create parent directory first
+	var parentDir = path.Dir(remoteDir)
+	if !isRemoteDirExisted(sftpClient, remoteDir) {
+		mkRemoteDirs(sftpClient, parentDir)
+		return sftpClient.Mkdir(remoteDir)
+	}
+	return nil
 }
 
 func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {

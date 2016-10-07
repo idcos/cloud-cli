@@ -283,11 +283,11 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
 
 	buf := make([]byte, 1024)
 	for {
-		n, _ := srcFile.Read(buf)
-		if n == 0 {
+		nread, _ := srcFile.Read(buf)
+		if nread == 0 {
 			break
 		}
-		dstFile.Write(buf)
+		dstFile.Write(buf[:nread])
 	}
 
 	return nil

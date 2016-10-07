@@ -6,6 +6,10 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
+* v0.6.2 版（2016-10-07）
+1. put subcommand 在远程文件夹不存在时，自动创建远程文件夹
+2. fix bug put 传输文件时，文件内容有丢失
+ 
 * v0.6.1 版（2016-09-23）
 1. fix issue #6 --src/--dst 不能自动补全本地路径
 2. fix 输入不存在的参数时，Tab自动补全时全是错误的备选项

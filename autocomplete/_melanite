@@ -2,75 +2,75 @@
 
 _melanite() {
     local curcontext="$curcontext" state line
-	  typeset -A opt_args
+    typeset -A opt_args
 
     _arguments -C \
-		           ':command:->command' \
-		           '*::options:->options'
+               ':command:->command' \
+               '*::options:->options'
 
-	  case $state in
-		    (command)
+    case $state in
+        (command)
 
-			      local -a subcommands
-			      subcommands=(
-				        'list:List host info.'
-				        'exec:Exec command to remote servers.'
-				        'login:Login to remote server.'
-				        'put:Transfer file to remote server.'
-				        'get:Transfer file from remote server.'
-				        'help:Print help info.'
-			      )
-			      _describe -t commands 'melanite' subcommands
-		        ;;
+            local -a subcommands
+            subcommands=(
+                'list:List host info.'
+                'exec:Exec command to remote servers.'
+                'login:Login to remote server.'
+                'put:Transfer file to remote server.'
+                'get:Transfer file from remote server.'
+                'help:Print help info.'
+            )
+            _describe -t commands 'melanite' subcommands
+            ;;
 
-		    (options)
-			      case $line[1] in
+        (options)
+            case $line[1] in
 
-				        (list)
+                (list)
                     __melanite_list
-					          ;;
+                    ;;
 
-					      (exec)
+                (exec)
                     __melanite_exec
-					          ;;
+                    ;;
 
-					      (login)
+                (login)
                     __melanite_login
-					          ;;
+                    ;;
 
-					      (put)
+                (put)
                     __melanite_put
-					          ;;
+                    ;;
 
-					      (get)
+                (get)
                     __melanite_get
-					          ;;
+                    ;;
 
-					      (help)
+                (help)
                     __melanite_help
-					          ;;
-			      esac
-		        ;;
-	  esac
+                    ;;
+            esac
+            ;;
+    esac
 }
 
 __melanite_help() {
     _arguments -C \
-		           ':command:->command'
+               ':command:->command'
 
-	  case $state in
-		    (command)
+    case $state in
+        (command)
 
-			      local -a subcommands
-			      subcommands=(
-				        'list:List subcommand.'
-				        'exec:Exec subcommand.'
-				        'login:Login subcommand.'
-				        'put:Put subcommand.'
-				        'get:Get subcommand.'
-			      )
-			      _describe -t commands 'melanite help' subcommands
-		        ;;
+            local -a subcommands
+            subcommands=(
+                'list:List subcommand.'
+                'exec:Exec subcommand.'
+                'login:Login subcommand.'
+                'put:Put subcommand.'
+                'get:Get subcommand.'
+            )
+            _describe -t commands 'melanite help' subcommands
+            ;;
     esac
 
 }
@@ -78,33 +78,33 @@ __melanite_help() {
 
 __melanite_list() {
 
-		_arguments -C -s -S \
-				       '-n[remote node name]:node name:__generate_nodes' \
-				       '--node[remote node name]:node name:__generate_nodes' \
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
                '-g[group name]:group name:__generate_groups' \
                '--group[group name]:group name:__generate_groups' \
-				       {'-a','--all'}'[display detail info]::'
+               {'-a','--all'}'[display detail info]::'
 
 }
 
 __melanite_exec() {
 
-		_arguments -C -s -S \
-				       '-n[remote node name]:node name:__generate_nodes' \
-				       '--node[remote node name]:node name:__generate_nodes' \
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
                '-g[group name]:group name:__generate_groups' \
                '--group[group name]:group name:__generate_groups' \
-				       {'-u','--user'}'[user who exec the command]::' \
-				       {'-y','--yes'}'[is confirm before excute command?]::' \
-				       {'-c','--cmd'}'[command for exec]::'
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               {'-c','--cmd'}'[command for exec]::'
 
 }
 
 __melanite_login() {
 
-		_arguments -C -s -S \
-				       '-n[remote node name]:node name:__generate_nodes' \
-				       '--node[remote node name]:node name:__generate_nodes' \
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
                '-g[group name]:group name:__generate_groups' \
                '--group[group name]:group name:__generate_groups'
 
@@ -112,29 +112,29 @@ __melanite_login() {
 
 __melanite_put() {
 
-		_arguments -C -s -S \
-				       '-n[remote node name]:node name:__generate_nodes' \
-				       '--node[remote node name]:node name:__generate_nodes' \
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
                '-g[group name]:group name:__generate_groups' \
                '--group[group name]:group name:__generate_groups' \
-				       {'-u','--user'}'[user who exec the command]::' \
-				       {'-y','--yes'}'[is confirm before excute command?]::' \
-				       '--src[source file or directory]:file path:_files' \
-				       '--dst[destination *directory*]:file path:_files'
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               '--src[source file or directory]:file path:_files' \
+               '--dst[destination *directory*]:file path:_files'
 
 }
 
 __melanite_get() {
 
-		_arguments -C -s -S \
-				       '-n[remote node name]:node name:__generate_nodes' \
-				       '--node[remote node name]:node name:__generate_nodes' \
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
                '-g[group name]:group name:__generate_groups' \
                '--group[group name]:group name:__generate_groups' \
-				       {'-u','--user'}'[user who exec the command]::' \
-				       {'-y','--yes'}'[is confirm before excute command?]::' \
-				       '--src[source file or directory]:file path:_files' \
-				       '--dst[destination *directory*]:file path:_files'
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               '--src[source file or directory]:file path:_files' \
+               '--dst[destination *directory*]:file path:_files'
 
 }
 

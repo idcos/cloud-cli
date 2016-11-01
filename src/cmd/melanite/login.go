@@ -9,7 +9,7 @@ import (
 	"runner/sshrunner"
 	"strings"
 
-	"util"
+	"utils"
 
 	"io/ioutil"
 
@@ -155,7 +155,7 @@ func getNodeNameAndHost() (string, string, error) {
 		err      error
 	)
 
-	filePath, err = util.ConvertHomeDir("~/.picked")
+	filePath, err = utils.ConvertHomeDir("~/.picked")
 	if err != nil {
 		return "", "", err
 	}
@@ -170,5 +170,5 @@ func getNodeNameAndHost() (string, string, error) {
 		return "", "", fmt.Errorf("wrong content in tempfile ~/.picked")
 	}
 
-	return util.Trim(result[0], " ", "\t", "\n"), util.Trim(result[1], " ", "\t", "\n"), nil
+	return utils.Trim(result[0], " ", "\t", "\n"), utils.Trim(result[1], " ", "\t", "\n"), nil
 }

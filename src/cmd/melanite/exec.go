@@ -11,7 +11,7 @@ import (
 
 	"fmt"
 
-	"util"
+	"utils"
 )
 
 var (
@@ -68,12 +68,12 @@ func initExecSubCmd(app *cli.App) {
 			}
 			var ep, err = checkExecParams(c)
 			if err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "exec")
 				return err
 			}
 			if err = execCmd(ep); err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 			}
 			return err
 		},
@@ -128,7 +128,7 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 	var allOutputs = make([]*runner.ExecOutput, 0)
 	var execStart = time.Now()
 	for _, n := range nodes {
-		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", utils.FgBoldGreen(ep.Cmd), utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
 		var input = runner.ExecInput{
 			ExecHost: n.Host,
@@ -168,7 +168,7 @@ func concurrentExecCmd(nodes []model.Node, ep execParams) error {
 	var totalCnt = len(nodes)
 	for ch := range outputChan {
 		totalCnt -= 1
-		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", util.FgBoldGreen(ep.Cmd), util.FgBoldGreen(ch.In.ExecUser), util.FgBoldGreen(ch.In.ExecHost))
+		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", utils.FgBoldGreen(ep.Cmd), utils.FgBoldGreen(ch.In.ExecUser), utils.FgBoldGreen(ch.In.ExecHost))
 		displayExecResult(ch.Out)
 		allOutputs = append(allOutputs, ch.Out)
 
@@ -183,7 +183,7 @@ func concurrentExecCmd(nodes []model.Node, ep execParams) error {
 
 func displayExecResult(output *runner.ExecOutput) {
 	if output.Err != nil {
-		fmt.Printf("Command exec failed: %s\n", util.FgRed(output.Err))
+		fmt.Printf("Command exec failed: %s\n", utils.FgRed(output.Err))
 	}
 
 	if output != nil {
@@ -193,7 +193,7 @@ func displayExecResult(output *runner.ExecOutput) {
 		}
 		fmt.Printf("time costs: %v\n", output.ExecEnd.Sub(output.ExecStart))
 	}
-	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+	fmt.Println(utils.FgBoldBlue("==========================================================\n"))
 }
 
 func displayTotalExecResult(outputs []*runner.ExecOutput, execStart, execEnd time.Time) {
@@ -212,9 +212,9 @@ func displayTotalExecResult(outputs []*runner.ExecOutput, execStart, execEnd tim
 
 	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s | timeout nodes: %s\n\n\n",
 		execEnd.Sub(execStart),
-		util.FgBoldGreen(successCnt),
-		util.FgBoldRed(failCnt),
-		util.FgBoldYellow(timeoutCnt))
+		utils.FgBoldGreen(successCnt),
+		utils.FgBoldRed(failCnt),
+		utils.FgBoldYellow(timeoutCnt))
 }
 
 func confirmExec(nodes []model.Node, user, cmd string) bool {
@@ -225,8 +225,8 @@ func confirmExec(nodes []model.Node, user, cmd string) bool {
 	}
 
 	fmt.Println()
-	return util.Confirm(fmt.Sprintf("You want to exec COMMAND(%s) by UESR(%s) at the above nodes, yes/no(y/n) ?",
-		util.FgBoldRed(cmd), util.FgBoldRed(user)))
+	return utils.Confirm(fmt.Sprintf("You want to exec COMMAND(%s) by UESR(%s) at the above nodes, yes/no(y/n) ?",
+		utils.FgBoldRed(cmd), utils.FgBoldRed(user)))
 }
 
 func convertCmdAlias(cmdNo string) string {

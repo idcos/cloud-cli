@@ -7,7 +7,7 @@ import (
 	"os/user"
 	"path"
 
-	"util"
+	"utils"
 
 	"config/iniconf"
 
@@ -58,8 +58,8 @@ func main() {
 
 func initConfig() error {
 	var err error
-	if !util.FileExist(confPath) {
-		if !util.Confirm("Do you want to create your config file?(y or n)") {
+	if !utils.FileExist(confPath) {
+		if !utils.Confirm("Do you want to create your config file?(y or n)") {
 			return fmt.Errorf("You should create your init config file")
 		}
 		createConfFile()

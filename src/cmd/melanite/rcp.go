@@ -8,7 +8,7 @@ import (
 	"runner/sshrunner"
 	"time"
 
-	"util"
+	"utils"
 
 	"github.com/urfave/cli"
 )
@@ -77,12 +77,12 @@ func initRcpSubCmd(app *cli.App) {
 
 			var rp, err = checkRcpParams(c)
 			if err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "put")
 				return err
 			}
 			if err = rcpCmd(rp, true); err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 			}
 
 			return nil
@@ -133,12 +133,12 @@ func initRcpSubCmd(app *cli.App) {
 
 			var rp, err = checkRcpParams(c)
 			if err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "get")
 				return err
 			}
 			if err = rcpCmd(rp, false); err != nil {
-				fmt.Println(util.FgRed(err))
+				fmt.Println(utils.FgRed(err))
 			}
 
 			return nil
@@ -205,15 +205,15 @@ func confirmRcp(nodes []model.Node, user, from, to string) bool {
 	}
 
 	fmt.Println()
-	return util.Confirm(fmt.Sprintf("You want to copy [%s] to [%s] by UESR(%s) at the above nodes, yes/no(y/n) ?",
-		util.FgBoldRed(from), util.FgBoldRed(to), util.FgBoldRed(user)))
+	return utils.Confirm(fmt.Sprintf("You want to copy [%s] to [%s] by UESR(%s) at the above nodes, yes/no(y/n) ?",
+		utils.FgBoldRed(from), utils.FgBoldRed(to), utils.FgBoldRed(user)))
 }
 
 func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	var allOutputs = make([]*runner.RcpOutput, 0)
 	var execStart = time.Now()
 	for _, n := range nodes {
-		fmt.Printf("%s(%s):\n", util.FgBoldGreen(n.Name), util.FgBoldGreen(n.Host))
+		fmt.Printf("%s(%s):\n", utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
 		var sftpClient = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
 
 		var input = runner.RcpInput{
@@ -239,11 +239,11 @@ func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 
 func displayRcpResult(output *runner.RcpOutput) {
 	if output.Err != nil {
-		fmt.Printf("copy file/directory failed: %s\n", util.FgRed(output.Err))
+		fmt.Printf("copy file/directory failed: %s\n", utils.FgRed(output.Err))
 	}
 
 	fmt.Printf("time costs: %v\n", output.RcpEnd.Sub(output.RcpStart))
-	fmt.Println(util.FgBoldBlue("==========================================================\n"))
+	fmt.Println(utils.FgBoldBlue("==========================================================\n"))
 }
 
 func displayTotalRcpResult(outputs []*runner.RcpOutput, rcpStart, rcpEnd time.Time) {
@@ -257,8 +257,8 @@ func displayTotalRcpResult(outputs []*runner.RcpOutput, rcpStart, rcpEnd time.Ti
 		}
 	}
 
-	fmt.Printf("total time costs: %v\nEXEC success nodes: %s | fail nodes: %s\n\n\n",
+	fmt.Printf("total time costs: %v\nRCP success nodes: %s | fail nodes: %s\n\n\n",
 		rcpEnd.Sub(rcpStart),
-		util.FgBoldGreen(successCnt),
-		util.FgBoldRed(failCnt))
+		utils.FgBoldGreen(successCnt),
+		utils.FgBoldRed(failCnt))
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runner"
+	"strings"
 	"time"
 
 	"github.com/pkg/sftp"
@@ -286,13 +287,27 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
 	}
 	defer dstFile.Close()
 
-	buf := make([]byte, 1024)
+	var fSize int64
+	if fi, err := srcFile.Stat(); err != nil {
+		return err
+	} else {
+		fSize = fi.Size()
+	}
+
+	var bufSize = 1024
+	buf := make([]byte, bufSize)
+	var i int64
 	for {
+		i++
 		nread, _ := srcFile.Read(buf)
 		if nread == 0 {
+			fmt.Printf("%-30s  100%%[%s]\n", strings.Repeat("#", 30), filename)
 			break
 		}
 		dstFile.Write(buf[:nread])
+
+		percentage := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
+		fmt.Printf("%-30s  %d%%[%s]\r", strings.Repeat("#", int(30*percentage/100)), percentage, filename)
 	}
 
 	return nil

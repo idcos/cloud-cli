@@ -372,7 +372,28 @@ func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
 	}
 	defer dstFile.Close()
 
-	_, err = srcFile.WriteTo(dstFile)
+	var fSize int64
+	if fi, err := srcFile.Stat(); err != nil {
+		return err
+	} else {
+		fSize = fi.Size()
+	}
+
+	var bufSize = 1024
+	buf := make([]byte, bufSize)
+	var i int64
+	for {
+		i++
+		nread, _ := srcFile.Read(buf)
+		if nread == 0 {
+			break
+		}
+		dstFile.Write(buf[:nread])
+
+		percent := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
+		utils.PrintFileProgress(localPath, int(percent))
+	}
+
 	return err
 }
 

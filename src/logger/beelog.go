@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"util"
+	"utils"
 
 	"github.com/astaxie/beego/logs"
 )
@@ -34,7 +34,7 @@ func selectLevel(level string) uint {
 
 // NewFileLogger output to file
 func NewFileLogger(logFilePath, level string) *logs.BeeLogger {
-	filename, _ := util.ConvertHomeDir(logFilePath)
+	filename, _ := utils.ConvertHomeDir(logFilePath)
 
 	var logConf struct {
 		FileName string `json:"filename"`

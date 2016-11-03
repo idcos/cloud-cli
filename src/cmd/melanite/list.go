@@ -7,7 +7,7 @@ import (
 
 	"github.com/urfave/cli"
 
-	"util"
+	"utils"
 )
 
 func initListSubCmd(app *cli.App) {
@@ -73,9 +73,9 @@ func listNodes(groupName, nodeName string, isDisplayAll bool) error {
 
 func displaySimpleInfo(groups []model.NodeGroup) {
 	for _, g := range groups {
-		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
+		fmt.Printf("Group(%s) Nodes: >>>\n", utils.FgBoldGreen(g.Name))
 		fmt.Printf("%-3s\t%-10s\t%-10s\n", "No.", "Name", "Host")
-		fmt.Println(util.FgBoldBlue("=========================================================="))
+		fmt.Println(utils.FgBoldBlue("=========================================================="))
 		for index, n := range g.Nodes {
 			fmt.Printf("%-3d\t%-10s\t%-10s\n", index+1, n.Name, n.Host)
 		}
@@ -85,9 +85,9 @@ func displaySimpleInfo(groups []model.NodeGroup) {
 
 func displayDetailInfo(groups []model.NodeGroup) {
 	for _, g := range groups {
-		fmt.Printf("Group(%s) Nodes: >>>\n", util.FgBoldGreen(g.Name))
+		fmt.Printf("Group(%s) Nodes: >>>\n", utils.FgBoldGreen(g.Name))
 		fmt.Printf("%-3s\t%-10s\t%-30s\t%-5s\t%-8s\t%-15s\t%-20s\n", "No.", "Name", "Host", "Port", "User", "Password", "KeyPath")
-		fmt.Println(util.FgBoldBlue("========================================================================================================"))
+		fmt.Println(utils.FgBoldBlue("========================================================================================================"))
 		for index, n := range g.Nodes {
 			fmt.Printf("%-3d\t%-10s\t%-30s\t%-5d\t%-8s\t%-15s\t%-20s\n", index+1, n.Name, n.Host, n.Port, n.User, n.Password, n.KeyPath)
 		}

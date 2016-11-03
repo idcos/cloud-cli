@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"model"
 
-	"util"
+	"utils"
 
 	"regexp"
 
@@ -25,7 +25,7 @@ func New(yamlFilePath string) (*YAMLRepo, error) {
 	var buf []byte
 	var yamlRepo YAMLRepo
 
-	yamlRepo.YAMLFilePath, err = util.ConvertHomeDir(yamlFilePath)
+	yamlRepo.YAMLFilePath, err = utils.ConvertHomeDir(yamlFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (yp *YAMLRepo) FilterNodeGroups(gName string) ([]model.NodeGroup, error) {
 		return filterNodeGroups, nil
 	}
 
-	gNamePattern := util.WildCharToRegexp(gName)
+	gNamePattern := utils.WildCharToRegexp(gName)
 	for _, g := range yp.NodeGroups {
 		matched, _ := regexp.MatchString(gNamePattern, g.Name)
 		if matched {
@@ -71,7 +71,7 @@ func (yp *YAMLRepo) FilterNodeGroupsAndNodes(gName string, nNames ...string) ([]
 		var filterNodes = make([]model.Node, 0)
 
 		for _, n := range g.Nodes {
-			if util.IsWildCharMatch(n.Name, nNames...) {
+			if utils.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)
 			}
 		}
@@ -99,7 +99,7 @@ func (yp *YAMLRepo) FilterNodes(gName string, nNames ...string) ([]model.Node, e
 
 		g = initNodesByGroup(g)
 		for _, n := range g.Nodes {
-			if util.IsWildCharMatch(n.Name, nNames...) {
+			if utils.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)
 			}
 		}

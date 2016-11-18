@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version  = "v0.6.3"
+	version  = "v0.6.4"
 	confPath = ".melanite.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger

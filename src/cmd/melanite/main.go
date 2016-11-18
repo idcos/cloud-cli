@@ -52,6 +52,7 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)
+		log.Error("%s\n", err)
 		os.Exit(1)
 	}
 }

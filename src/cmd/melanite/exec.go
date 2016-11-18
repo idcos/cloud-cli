@@ -70,12 +70,9 @@ func initExecSubCmd(app *cli.App) {
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "exec")
-				return err
+				return nil
 			}
-			if err = execCmd(ep); err != nil {
-				fmt.Println(utils.FgRed(err))
-			}
-			return err
+			return execCmd(ep)
 		},
 	}
 

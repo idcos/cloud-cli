@@ -79,13 +79,10 @@ func initRcpSubCmd(app *cli.App) {
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "put")
-				return err
-			}
-			if err = rcpCmd(rp, true); err != nil {
-				fmt.Println(utils.FgRed(err))
+				return nil
 			}
 
-			return nil
+			return rcpCmd(rp, true)
 		},
 	}
 
@@ -135,13 +132,10 @@ func initRcpSubCmd(app *cli.App) {
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "get")
-				return err
-			}
-			if err = rcpCmd(rp, false); err != nil {
-				fmt.Println(utils.FgRed(err))
+				return nil
 			}
 
-			return nil
+			return rcpCmd(rp, false)
 		},
 	}
 

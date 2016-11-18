@@ -49,11 +49,7 @@ func initLoginSubCmd(app *cli.App) {
 
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
-			var err error
-			if err = loginNode(groupName, nodeName); err != nil {
-				fmt.Println(err)
-			}
-			return err
+			return loginNode(groupName, nodeName)
 		},
 	}
 
@@ -90,6 +86,10 @@ func loginNode(groupName, nodeName string) error {
 		nodes[index].KeyPath,
 		nodes[index].Host,
 		nodes[index].Port)
+
+	if conf.Main.LoginShell == "" {
+		return fmt.Errorf("You must set loginShell in .melanite.ini")
+	}
 
 	return runCmd.Login(conf.Main.LoginShell)
 }

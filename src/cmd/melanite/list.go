@@ -41,11 +41,7 @@ func initListSubCmd(app *cli.App) {
 			var groupName = c.String("group")
 			var nodeName = c.String("node")
 			var isDisplayAll = c.Bool("all")
-			var err error
-			if err = listNodes(groupName, nodeName, isDisplayAll); err != nil {
-				fmt.Println(err)
-			}
-			return err
+			return listNodes(groupName, nodeName, isDisplayAll)
 		},
 	}
 

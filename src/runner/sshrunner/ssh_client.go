@@ -167,6 +167,9 @@ func (sc *SSHClient) Put(localPath, remotePath string) error {
 	}
 
 	if localFileInfo.IsDir() { // localPath is directory
+		if string(localPath[len(localPath)-1]) == "/" {
+			remotePath = path.Join(remotePath, path.Base(localPath))
+		}
 		return putDir(sc.sftpClient, localPath, remotePath)
 	} else { // localPath is file
 		return putFile(sc.sftpClient, localPath, remotePath)
@@ -195,6 +198,10 @@ func (sc *SSHClient) Get(localPath, remotePath string) error {
 	}
 
 	if remoteFileInfo.IsDir() {
+		if string(remotePath[len(remotePath)-1]) == "/" {
+			localPath = path.Join(localPath, path.Base(remotePath))
+			os.MkdirAll(localPath, os.ModePerm)
+		}
 		return getDir(sc.sftpClient, localPath, remotePath)
 	} else {
 		return getFile(sc.sftpClient, localPath, remotePath)

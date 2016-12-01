@@ -305,6 +305,8 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf 
 
 	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
+	bar := utils.NewProgressBar(localPath, fSize)
+
 	var i int64
 	for {
 		i++
@@ -314,9 +316,9 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf 
 		}
 		dstFile.Write(buf[:nread])
 
-		percent := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
-		utils.PrintFileProgress(localPath, int(percent))
+		bar.Add(nread)
 	}
+	bar.Finish()
 
 	return nil
 }
@@ -390,6 +392,8 @@ func getFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf
 
 	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
+	bar := utils.NewProgressBar(localPath, fSize)
+
 	var i int64
 	for {
 		i++
@@ -399,9 +403,9 @@ func getFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf
 		}
 		dstFile.Write(buf[:nread])
 
-		percent := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
-		utils.PrintFileProgress(localPath, int(percent))
+		bar.Add(nread)
 	}
+	bar.Finish()
 
 	return err
 }

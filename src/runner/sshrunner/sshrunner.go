@@ -18,10 +18,10 @@ type SSHRunner struct {
 	client *SSHClient
 }
 
-func New(user, password, sshKeyPath, host string, port int) *SSHRunner {
+func New(user, password, sshKeyPath, host string, port, fileTransBuf int) *SSHRunner {
 
 	return &SSHRunner{
-		client: NewSSHClient(user, password, sshKeyPath, host, port),
+		client: NewSSHClient(user, password, sshKeyPath, host, port, fileTransBuf),
 	}
 }
 

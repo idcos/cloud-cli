@@ -13,6 +13,7 @@ type Config struct {
 		ConcurrentNum int    `ini:"concurrentNum"`
 		Timeout       int64  `ini:"timeout"`
 		LoginShell    string `ini:"loginShell"`
+		FileTransBuf  int    `ini:"fileTransBuf"`
 	}
 	Logger struct {
 		Level   string `ini:"level"`

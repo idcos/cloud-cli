@@ -208,7 +208,7 @@ func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	var execStart = time.Now()
 	for _, n := range nodes {
 		fmt.Printf("%s(%s):\n", utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
-		var sftpClient = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var sftpClient = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
 
 		var input = runner.RcpInput{
 			SrcPath: rp.Src,

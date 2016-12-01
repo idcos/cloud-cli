@@ -23,27 +23,29 @@ var (
 )
 
 type SSHClient struct {
-	User       string
-	Password   string
-	SSHKeyPath string
-	Host       string
-	Port       int
-	client     *ssh.Client
-	session    *ssh.Session
-	sftpClient *sftp.Client
+	User         string
+	Password     string
+	SSHKeyPath   string
+	Host         string
+	Port         int
+	FileTransBuf int
+	client       *ssh.Client
+	session      *ssh.Session
+	sftpClient   *sftp.Client
 }
 
-func NewSSHClient(user, password, sshKeyPath, host string, port int) *SSHClient {
+func NewSSHClient(user, password, sshKeyPath, host string, port, fileTransBuf int) *SSHClient {
 	if port == 0 {
 		port = 22
 	}
 
 	return &SSHClient{
-		User:       user,
-		Password:   password,
-		SSHKeyPath: sshKeyPath,
-		Host:       host,
-		Port:       port,
+		User:         user,
+		Password:     password,
+		SSHKeyPath:   sshKeyPath,
+		Host:         host,
+		Port:         port,
+		FileTransBuf: fileTransBuf,
 	}
 }
 
@@ -170,9 +172,9 @@ func (sc *SSHClient) Put(localPath, remotePath string) error {
 		if string(localPath[len(localPath)-1]) == "/" {
 			remotePath = path.Join(remotePath, path.Base(localPath))
 		}
-		return putDir(sc.sftpClient, localPath, remotePath)
+		return putDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
 	} else { // localPath is file
-		return putFile(sc.sftpClient, localPath, remotePath)
+		return putFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
 	}
 }
 
@@ -202,9 +204,9 @@ func (sc *SSHClient) Get(localPath, remotePath string) error {
 			localPath = path.Join(localPath, path.Base(remotePath))
 			os.MkdirAll(localPath, os.ModePerm)
 		}
-		return getDir(sc.sftpClient, localPath, remotePath)
+		return getDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
 	} else {
-		return getFile(sc.sftpClient, localPath, remotePath)
+		return getFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
 	}
 
 	return err
@@ -275,7 +277,7 @@ func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
 	return authMethods, nil
 }
 
-func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
+func putFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int) error {
 	filename := path.Base(localPath)
 	srcFile, err := os.Open(localPath)
 	if err != nil {
@@ -301,7 +303,7 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
 		fSize = fi.Size()
 	}
 
-	var bufSize = 1024
+	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
 	var i int64
 	for {
@@ -319,7 +321,7 @@ func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
 	return nil
 }
 
-func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
+func putDir(sftpClient *sftp.Client, localDir, remoteDir string, fileTransBuf int) error {
 
 	return filepath.Walk(localDir, func(localPath string, info os.FileInfo, err error) error {
 		relPath, err := filepath.Rel(localDir, localPath)
@@ -334,7 +336,7 @@ func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
 			}
 			return nil
 		} else {
-			return putFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)))
+			return putFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)), fileTransBuf)
 		}
 	})
 }
@@ -359,7 +361,7 @@ func mkRemoteDirs(sftpClient *sftp.Client, remoteDir string) error {
 	return nil
 }
 
-func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
+func getFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf int) error {
 
 	srcFile, err := sftpClient.Open(remoteFile)
 	if err != nil {
@@ -386,7 +388,7 @@ func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
 		fSize = fi.Size()
 	}
 
-	var bufSize = 1024
+	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
 	var i int64
 	for {
@@ -404,7 +406,7 @@ func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
 	return err
 }
 
-func getDir(sftpClient *sftp.Client, localPath, remoteDir string) error {
+func getDir(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int) error {
 	localFileInfo, err := os.Stat(localPath)
 	// remotepath is directory, localPath existed and be a file, cause error
 	if err == nil && !localFileInfo.IsDir() {
@@ -426,7 +428,7 @@ func getDir(sftpClient *sftp.Client, localPath, remoteDir string) error {
 				return err
 			}
 		} else {
-			if err = getFile(sftpClient, path.Join(localPath, relRemotePath), w.Path()); err != nil {
+			if err = getFile(sftpClient, path.Join(localPath, relRemotePath), w.Path(), fileTransBuf); err != nil {
 				return err
 			}
 		}

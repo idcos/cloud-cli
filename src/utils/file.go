@@ -8,6 +8,8 @@ import (
 	"path"
 	"path/filepath"
 
+	pb "gopkg.in/cheggaaa/pb.v1"
+
 	"github.com/pkg/sftp"
 )
 
@@ -63,7 +65,7 @@ func IsDir(filepath string) bool {
 }
 
 // PutFile put file to remote server
-func PutFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int) error {
+func PutFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int, bar *pb.ProgressBar) error {
 	filename := path.Base(localPath)
 	srcFile, err := os.Open(localPath)
 	if err != nil {
@@ -91,7 +93,9 @@ func PutFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf 
 
 	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
-	bar := NewProgressBar(localPath, fSize)
+	if bar == nil {
+		bar = NewProgressBar(localPath, fSize)
+	}
 
 	var i int64
 	for {
@@ -104,13 +108,15 @@ func PutFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf 
 
 		bar.Add(nread)
 	}
-	bar.Finish()
+	if bar.Total == bar.Get() {
+		bar.Finish()
+	}
 
 	return nil
 }
 
 // PutDir put directories to remote server
-func PutDir(sftpClient *sftp.Client, localDir, remoteDir string, fileTransBuf int) error {
+func PutDir(sftpClient *sftp.Client, localDir, remoteDir string, fileTransBuf int, bar *pb.ProgressBar) error {
 
 	return filepath.Walk(localDir, func(localPath string, info os.FileInfo, err error) error {
 		relPath, err := filepath.Rel(localDir, localPath)
@@ -125,7 +131,7 @@ func PutDir(sftpClient *sftp.Client, localDir, remoteDir string, fileTransBuf in
 			}
 			return nil
 		} else {
-			return PutFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)), fileTransBuf)
+			return PutFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)), fileTransBuf, bar)
 		}
 	})
 }
@@ -153,7 +159,7 @@ func MkRemoteDirs(sftpClient *sftp.Client, remoteDir string) error {
 }
 
 // GetFile get file from remote server
-func GetFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf int) error {
+func GetFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf int, bar *pb.ProgressBar) error {
 
 	srcFile, err := sftpClient.Open(remoteFile)
 	if err != nil {
@@ -182,7 +188,9 @@ func GetFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf
 
 	var bufSize = fileTransBuf
 	buf := make([]byte, bufSize)
-	bar := NewProgressBar(localPath, fSize)
+	if bar == nil {
+		bar = NewProgressBar(localPath, fSize)
+	}
 
 	var i int64
 	for {
@@ -195,13 +203,15 @@ func GetFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf
 
 		bar.Add(nread)
 	}
-	bar.Finish()
+	if bar.Total == bar.Get() {
+		bar.Finish()
+	}
 
 	return err
 }
 
 // GetDir get directory from remote server
-func GetDir(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int) error {
+func GetDir(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf int, bar *pb.ProgressBar) error {
 	localFileInfo, err := os.Stat(localPath)
 	// remotepath is directory, localPath existed and be a file, cause error
 	if err == nil && !localFileInfo.IsDir() {
@@ -223,11 +233,46 @@ func GetDir(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf i
 				return err
 			}
 		} else {
-			if err = GetFile(sftpClient, path.Join(localPath, relRemotePath), w.Path(), fileTransBuf); err != nil {
+			if err = GetFile(sftpClient, path.Join(localPath, relRemotePath), w.Path(), fileTransBuf, bar); err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
+}
+
+// LocalDirSize directory size with all file in it
+func LocalDirSize(dirPath string) (int64, error) {
+	var size int64
+	err := filepath.Walk(dirPath, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+
+	return size, err
+}
+
+// RemoteDirSize directory size with all file in it
+func RemoteDirSize(sftpClient *sftp.Client, dirPath string) (int64, error) {
+	var size int64
+	var err error
+
+	w := sftpClient.Walk(dirPath)
+	for w.Step() {
+		if err = w.Err(); err != nil {
+			return size, err
+		}
+
+		_, err = filepath.Rel(dirPath, w.Path())
+		if err != nil {
+			return size, err
+		}
+		if !w.Stat().IsDir() {
+			size += w.Stat().Size()
+		}
+	}
+	return size, err
 }

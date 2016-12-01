@@ -9,6 +9,8 @@ import (
 	"time"
 	"utils"
 
+	pb "gopkg.in/cheggaaa/pb.v1"
+
 	"github.com/pkg/sftp"
 
 	"path"
@@ -142,7 +144,7 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 }
 
 // Put transfer file/directory to remote server
-func (sc *SSHClient) Put(localPath, remotePath string) error {
+func (sc *SSHClient) Put(localPath, remotePath string, bar *pb.ProgressBar) error {
 	var (
 		err           error
 		localFileInfo os.FileInfo
@@ -167,14 +169,14 @@ func (sc *SSHClient) Put(localPath, remotePath string) error {
 		if string(localPath[len(localPath)-1]) == "/" {
 			remotePath = path.Join(remotePath, path.Base(localPath))
 		}
-		return utils.PutDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
+		return utils.PutDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
 	} else { // localPath is file
-		return utils.PutFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
+		return utils.PutFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
 	}
 }
 
 // Get transfer file/directory from remote server
-func (sc *SSHClient) Get(localPath, remotePath string) error {
+func (sc *SSHClient) Get(localPath, remotePath string, bar *pb.ProgressBar) error {
 	var (
 		err            error
 		remoteFileInfo os.FileInfo
@@ -199,9 +201,9 @@ func (sc *SSHClient) Get(localPath, remotePath string) error {
 			localPath = path.Join(localPath, path.Base(remotePath))
 			os.MkdirAll(localPath, os.ModePerm)
 		}
-		return utils.GetDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
+		return utils.GetDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
 	} else {
-		return utils.GetFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf)
+		return utils.GetFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
 	}
 
 	return err

@@ -146,7 +146,7 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 func concurrentExecCmd(nodes []model.Node, ep execParams) error {
 	var allOutputs = make([]*runner.ExecOutput, 0)
 	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
-	var outputChan = make(chan *runner.ConcurrentOutput)
+	var outputChan = make(chan *runner.ConcurrentExecOutput)
 
 	var execStart = time.Now()
 	for _, n := range nodes {

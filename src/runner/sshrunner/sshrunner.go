@@ -43,10 +43,10 @@ func (sr *SSHRunner) SyncExec(input runner.ExecInput) *runner.ExecOutput {
 }
 
 // ConcurrentExec execute command sync
-func (sr *SSHRunner) ConcurrentExec(input runner.ExecInput, outputChan chan *runner.ConcurrentOutput, limitChan chan int) {
+func (sr *SSHRunner) ConcurrentExec(input runner.ExecInput, outputChan chan *runner.ConcurrentExecOutput, limitChan chan int) {
 	limitChan <- 1
 	var output = sr.SyncExec(input)
-	outputChan <- &runner.ConcurrentOutput{In: input, Out: output}
+	outputChan <- &runner.ConcurrentExecOutput{In: input, Out: output}
 	<-limitChan
 }
 
@@ -58,7 +58,7 @@ func (sr *SSHRunner) Login(shell string) error {
 // SyncPut copy file to remote server sync
 func (sr *SSHRunner) SyncPut(input runner.RcpInput) *runner.RcpOutput {
 	rcpStart := time.Now()
-	err := sr.client.Put(input.SrcPath, input.DstPath)
+	err := sr.client.Put(input.SrcPath, input.DstPath, nil)
 
 	return &runner.RcpOutput{
 		RcpStart: rcpStart,
@@ -70,13 +70,27 @@ func (sr *SSHRunner) SyncPut(input runner.RcpInput) *runner.RcpOutput {
 // SyncGet copy file from remote server sync
 func (sr *SSHRunner) SyncGet(input runner.RcpInput) *runner.RcpOutput {
 	rcpStart := time.Now()
-	err := sr.client.Get(input.DstPath, input.SrcPath)
+	err := sr.client.Get(input.DstPath, input.SrcPath, nil)
 
 	return &runner.RcpOutput{
 		RcpStart: rcpStart,
 		RcpEnd:   time.Now(),
 		Err:      err,
 	}
+}
+
+// ConcurrentPut copy file to remote server concurrency
+func (sr *SSHRunner) ConcurrentPut(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int) {
+	limitChan <- 1
+	var output = sr.SyncPut(input)
+	outputChan <- &runner.ConcurrentRcpOutput{In: input, Out: output}
+	<-limitChan
+
+}
+
+// ConcurrentGet copy file from remote server concurrency
+func (sr *SSHRunner) ConcurrentGet(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int) {
+
 }
 
 func compositCommand(input runner.ExecInput) string {

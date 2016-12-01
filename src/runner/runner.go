@@ -59,11 +59,19 @@ type RcpOutput struct {
 }
 
 // ConcurrentOutput output for concurrent exec command
-type ConcurrentOutput struct {
+type ConcurrentExecOutput struct {
 	// In for confirm the Out is from which node
 	In ExecInput
 	// Out concurrent exec output
 	Out *ExecOutput
+}
+
+// ConcurrentRcpOutput output for concurrent rcp command
+type ConcurrentRcpOutput struct {
+	// In for confirm the out is from which node
+	In RcpInput
+	// Out concurrent rcp output
+	Out *RcpOutput
 }
 
 // IRunner runner interface
@@ -71,12 +79,15 @@ type IRunner interface {
 	// SyncExec exec command sync
 	SyncExec(input ExecInput) *ExecOutput
 	// ConcurrentExec exec command concurrency
-	ConcurrentExec(input ExecInput, outputChan chan *ConcurrentOutput, limitChan chan int)
+	ConcurrentExec(input ExecInput, outputChan chan *ConcurrentExecOutput, limitChan chan int)
 	// Login login to remote server
 	Login(shell string) error
 	// SyncPut copy file to remote server sync
 	SyncPut(input RcpInput) *RcpOutput
 	// SyncGet copy file from remote server sync
 	SyncGet(input RcpInput) *RcpOutput
-	// ConcurrentRcp copy file to remote server concurrency
+	// ConcurrentPut copy file to remote server concurrency
+	ConcurrentPut(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int)
+	// ConcurrentGet copy file from remote server concurrency
+	ConcurrentGet(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int)
 }

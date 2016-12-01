@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"runner"
 	"time"
+	"utils"
+
+	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
@@ -79,17 +82,60 @@ func (sr *SSHRunner) SyncGet(input runner.RcpInput) *runner.RcpOutput {
 	}
 }
 
-// ConcurrentPut copy file to remote server concurrency
-func (sr *SSHRunner) ConcurrentPut(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int) {
+// ConcurrentGet copy file to remote server concurrency
+func (sr *SSHRunner) ConcurrentGet(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool) {
 	limitChan <- 1
-	var output = sr.SyncPut(input)
-	outputChan <- &runner.ConcurrentRcpOutput{In: input, Out: output}
-	<-limitChan
+	var bar *pb.ProgressBar
+	rcpStart := time.Now()
 
+	dirSize, err := utils.RemoteDirSize(sr.client.sftpClient, input.SrcPath)
+	if err != nil {
+		goto GetResult
+	}
+
+	bar = utils.NewProgressBar(input.RcpHost, dirSize)
+	if pool == nil {
+		pool, _ = pb.StartPool(bar)
+	} else {
+		pool.Add(bar)
+	}
+	err = sr.client.Get(input.DstPath, input.SrcPath, bar)
+
+GetResult:
+	outputChan <- &runner.ConcurrentRcpOutput{In: input, Out: &runner.RcpOutput{
+		RcpStart: rcpStart,
+		RcpEnd:   time.Now(),
+		Err:      err,
+	}}
+	<-limitChan
 }
 
-// ConcurrentGet copy file from remote server concurrency
-func (sr *SSHRunner) ConcurrentGet(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int) {
+// ConcurrentPut copy file from remote server concurrency
+func (sr *SSHRunner) ConcurrentPut(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool) {
+	limitChan <- 1
+	var bar *pb.ProgressBar
+	rcpStart := time.Now()
+
+	dirSize, err := utils.LocalDirSize(input.SrcPath)
+	if err != nil {
+		goto PutResult
+	}
+
+	bar = utils.NewProgressBar(input.RcpHost, dirSize)
+	if pool == nil {
+		pool, _ = pb.StartPool(bar)
+	} else {
+		pool.Add(bar)
+	}
+	err = sr.client.Put(input.SrcPath, input.DstPath, bar)
+
+PutResult:
+	outputChan <- &runner.ConcurrentRcpOutput{In: input, Out: &runner.RcpOutput{
+		RcpStart: rcpStart,
+		RcpEnd:   time.Now(),
+		Err:      err,
+	}}
+	<-limitChan
 
 }
 

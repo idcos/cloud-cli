@@ -95,6 +95,7 @@ func PutFile(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf 
 	buf := make([]byte, bufSize)
 	if bar == nil {
 		bar = NewProgressBar(localPath, fSize)
+		bar.Start()
 	}
 
 	var i int64
@@ -190,6 +191,7 @@ func GetFile(sftpClient *sftp.Client, localPath, remoteFile string, fileTransBuf
 	buf := make([]byte, bufSize)
 	if bar == nil {
 		bar = NewProgressBar(localPath, fSize)
+		bar.Start()
 	}
 
 	var i int64
@@ -244,6 +246,14 @@ func GetDir(sftpClient *sftp.Client, localPath, remoteDir string, fileTransBuf i
 
 // LocalDirSize directory size with all file in it
 func LocalDirSize(dirPath string) (int64, error) {
+	if !IsDir(dirPath) {
+		info, err := os.Stat(dirPath)
+		if err != nil {
+			return 0, err
+		}
+		return info.Size(), nil
+	}
+
 	var size int64
 	err := filepath.Walk(dirPath, func(_ string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -257,6 +267,14 @@ func LocalDirSize(dirPath string) (int64, error) {
 
 // RemoteDirSize directory size with all file in it
 func RemoteDirSize(sftpClient *sftp.Client, dirPath string) (int64, error) {
+	if !IsRemoteDirExisted(sftpClient, dirPath) {
+		info, err := sftpClient.Stat(dirPath)
+		if err != nil {
+			return 0, err
+		}
+		return info.Size(), nil
+	}
+
 	var size int64
 	var err error
 

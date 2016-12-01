@@ -8,6 +8,8 @@ import (
 	"runner/sshrunner"
 	"time"
 
+	pb "gopkg.in/cheggaaa/pb.v1"
+
 	"utils"
 
 	"github.com/urfave/cli"
@@ -183,8 +185,7 @@ func rcpCmd(rp rcpParams, isPut bool) error {
 
 	// exec cmd on node
 	if conf.Main.Sync {
-		// TODO copy file concurrency
-		return nil
+		return concurrentRcp(nodes, rp, isPut)
 	} else {
 		return syncRcp(nodes, rp, isPut)
 	}
@@ -205,10 +206,10 @@ func confirmRcp(nodes []model.Node, user, from, to string) bool {
 
 func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	var allOutputs = make([]*runner.RcpOutput, 0)
-	var execStart = time.Now()
+	var rcpStart = time.Now()
 	for _, n := range nodes {
 		fmt.Printf("%s(%s):\n", utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
-		var sftpClient = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
+		var runRcp = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
 
 		var input = runner.RcpInput{
 			SrcPath: rp.Src,
@@ -220,14 +221,55 @@ func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 		// display result
 		var output *runner.RcpOutput
 		if isPut {
-			output = sftpClient.SyncPut(input)
+			output = runRcp.SyncPut(input)
 		} else {
-			output = sftpClient.SyncGet(input)
+			output = runRcp.SyncGet(input)
 		}
 		displayRcpResult(output)
 		allOutputs = append(allOutputs, output)
 	}
-	displayTotalRcpResult(allOutputs, execStart, time.Now())
+	displayTotalRcpResult(allOutputs, rcpStart, time.Now())
+	return nil
+}
+
+func concurrentRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
+	var allOutputs = make([]*runner.RcpOutput, 0)
+	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
+	var outputChan = make(chan *runner.ConcurrentRcpOutput)
+	var pool *pb.Pool
+
+	var rcpStart = time.Now()
+	for _, n := range nodes {
+		var runRcp = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
+		var input = runner.RcpInput{
+			SrcPath: rp.Src,
+			DstPath: rp.Dst,
+			RcpHost: n.Host,
+			RcpUser: rp.User,
+		}
+
+		// rcp file/directory
+		if isPut {
+			go runRcp.ConcurrentPut(input, outputChan, concurrentLimitChan, pool)
+		} else {
+			go runRcp.ConcurrentGet(input, outputChan, concurrentLimitChan, pool)
+		}
+	}
+
+	var totalCnt = len(nodes)
+	for ch := range outputChan {
+		totalCnt -= 1
+		// fmt.Printf("RCP by %s(%s):\n", utils.FgBoldGreen(ch.In.RcpUser), utils.FgBoldGreen(ch.In.RcpHost))
+		// displayRcpResult(ch.Out)
+		allOutputs = append(allOutputs, ch.Out)
+
+		if totalCnt == 0 {
+			close(outputChan)
+		}
+	}
+
+	pool.Stop()
+	displayTotalRcpResult(allOutputs, rcpStart, time.Now())
 	return nil
 }
 

@@ -6,7 +6,6 @@ func NewProgressBar(prefix string, count int64) *pb.ProgressBar {
 	bar := pb.New64(count)
 	bar.ShowCounters = false
 	bar.ShowSpeed = false
-	bar.Prefix(prefix)
 
-	return bar.Start()
+	return bar.Prefix(prefix)
 }

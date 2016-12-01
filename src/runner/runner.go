@@ -1,6 +1,10 @@
 package runner
 
-import "time"
+import (
+	"time"
+
+	pb "gopkg.in/cheggaaa/pb.v1"
+)
 
 type OutputStaus string
 
@@ -87,7 +91,7 @@ type IRunner interface {
 	// SyncGet copy file from remote server sync
 	SyncGet(input RcpInput) *RcpOutput
 	// ConcurrentPut copy file to remote server concurrency
-	ConcurrentPut(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int)
+	ConcurrentPut(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool)
 	// ConcurrentGet copy file from remote server concurrency
-	ConcurrentGet(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int)
+	ConcurrentGet(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool)
 }

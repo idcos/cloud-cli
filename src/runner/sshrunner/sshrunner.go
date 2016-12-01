@@ -84,21 +84,22 @@ func (sr *SSHRunner) SyncGet(input runner.RcpInput) *runner.RcpOutput {
 
 // ConcurrentGet copy file to remote server concurrency
 func (sr *SSHRunner) ConcurrentGet(input runner.RcpInput, outputChan chan *runner.ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool) {
+	var (
+		err     error
+		bar     *pb.ProgressBar
+		dirSize int64
+	)
+
 	limitChan <- 1
-	var bar *pb.ProgressBar
 	rcpStart := time.Now()
 
-	dirSize, err := utils.RemoteDirSize(sr.client.sftpClient, input.SrcPath)
+	dirSize, err = utils.RemoteDirSize(sr.client.sftpClient, input.SrcPath)
 	if err != nil {
 		goto GetResult
 	}
 
 	bar = utils.NewProgressBar(input.RcpHost, dirSize)
-	if pool == nil {
-		pool, _ = pb.StartPool(bar)
-	} else {
-		pool.Add(bar)
-	}
+	pool.Add(bar)
 	err = sr.client.Get(input.DstPath, input.SrcPath, bar)
 
 GetResult:
@@ -122,11 +123,7 @@ func (sr *SSHRunner) ConcurrentPut(input runner.RcpInput, outputChan chan *runne
 	}
 
 	bar = utils.NewProgressBar(input.RcpHost, dirSize)
-	if pool == nil {
-		pool, _ = pb.StartPool(bar)
-	} else {
-		pool.Add(bar)
-	}
+	pool.Add(bar)
 	err = sr.client.Put(input.SrcPath, input.DstPath, bar)
 
 PutResult:
@@ -136,7 +133,6 @@ PutResult:
 		Err:      err,
 	}}
 	<-limitChan
-
 }
 
 func compositCommand(input runner.ExecInput) string {

@@ -197,10 +197,11 @@ func (sc *SSHClient) Get(localPath, remotePath string, bar *pb.ProgressBar) erro
 	}
 
 	if remoteFileInfo.IsDir() {
+		localPath = path.Join(localPath, sc.Host) // create dir by hostname
 		if string(remotePath[len(remotePath)-1]) == "/" {
 			localPath = path.Join(localPath, path.Base(remotePath))
-			os.MkdirAll(localPath, os.ModePerm)
 		}
+		os.MkdirAll(localPath, os.ModePerm)
 		return utils.GetDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
 	} else {
 		return utils.GetFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)

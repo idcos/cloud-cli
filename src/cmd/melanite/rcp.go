@@ -131,6 +131,7 @@ func initRcpSubCmd(app *cli.App) {
 			}
 
 			var rp, err = checkRcpParams(c)
+			fmt.Println(rp)
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "get")
@@ -237,6 +238,7 @@ func concurrentRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
 	var outputChan = make(chan *runner.ConcurrentRcpOutput)
 	var pool *pb.Pool
+	pool, _ = pb.StartPool()
 
 	var rcpStart = time.Now()
 	for _, n := range nodes {

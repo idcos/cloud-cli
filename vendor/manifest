@@ -21,6 +21,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/kless/term",
+			"repository": "https://github.com/kless/term",
+			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/kr/fs",
 			"repository": "https://github.com/kr/fs",
 			"revision": "2788f0dbd16903de03cb8186e5c7d97b69ad387b",
@@ -51,6 +57,25 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/sethgrid/curse",
+			"repository": "https://github.com/sethgrid/curse",
+			"revision": "3378651548d4bda6a856c69719d593d902ec8b21",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/sethgrid/multibar",
+			"repository": "https://github.com/sethgrid/multibar",
+			"revision": "4bf4cf7b87d60bfaf4b4ec40fc7aabf376d0be37",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/tredoe/term/sys",
+			"repository": "https://github.com/tredoe/term",
+			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",
+			"branch": "master",
+			"path": "/sys"
+		},
+		{
 			"importpath": "github.com/urfave/cli",
 			"repository": "https://github.com/urfave/cli",
 			"revision": "595ba45e735c1e9c1f9ddc9e2ef21997fca893f2",
@@ -76,6 +101,13 @@
 			"revision": "5bcd134fee4dd1475da17714aac19c0aa0142e2f",
 			"branch": "master",
 			"path": "/ssh"
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"revision": "d5645953809d8b4752afb2c3224b1f1ad73dfa70",
+			"branch": "master",
+			"path": "/unix"
 		},
 		{
 			"importpath": "gopkg.in/ini.v1",

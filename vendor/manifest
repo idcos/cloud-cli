@@ -45,6 +45,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/mattn/go-runewidth",
+			"repository": "https://github.com/mattn/go-runewidth",
+			"revision": "737072b4e32b7a5018b4a7125da8d12de90e8045",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/pkg/errors",
 			"repository": "https://github.com/pkg/errors",
 			"revision": "a2d6902c6d2a2f194eb3fb474981ab7867c81505",
@@ -96,6 +102,12 @@
 			"revision": "d5645953809d8b4752afb2c3224b1f1ad73dfa70",
 			"branch": "master",
 			"path": "/unix"
+		},
+		{
+			"importpath": "gopkg.in/cheggaaa/pb.v1",
+			"repository": "https://gopkg.in/cheggaaa/pb.v1",
+			"revision": "d7e6ca3010b6f084d8056847f55d7f572f180678",
+			"branch": "master"
 		},
 		{
 			"importpath": "gopkg.in/ini.v1",

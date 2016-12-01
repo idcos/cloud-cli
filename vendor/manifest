@@ -57,18 +57,6 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/sethgrid/curse",
-			"repository": "https://github.com/sethgrid/curse",
-			"revision": "3378651548d4bda6a856c69719d593d902ec8b21",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/sethgrid/multibar",
-			"repository": "https://github.com/sethgrid/multibar",
-			"revision": "4bf4cf7b87d60bfaf4b4ec40fc7aabf376d0be37",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/tredoe/term/sys",
 			"repository": "https://github.com/tredoe/term",
 			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",

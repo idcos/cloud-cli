@@ -1,21 +1,11 @@
 package utils
 
-import (
-	"fmt"
-	"strings"
-	"time"
-)
+import pb "gopkg.in/cheggaaa/pb.v1"
 
-const (
-	PercentChar string = "#"
-)
+func NewProgressBar(prefix string, count int64) *pb.ProgressBar {
+	bar := pb.New64(count)
+	bar.ShowCounters = false
+	bar.ShowSpeed = false
 
-func PrintFileProgress(filename string, percent int) {
-
-	if percent == 100 {
-		time.Sleep(10 * time.Microsecond)
-		fmt.Printf("\r%-50s  100%%[%s]\n", strings.Repeat(PercentChar, 50), filename)
-	} else {
-		fmt.Printf("\r%-50s  %d%%[%s]", strings.Repeat("#", percent*50/100), percent, filename)
-	}
+	return bar.Prefix(prefix)
 }

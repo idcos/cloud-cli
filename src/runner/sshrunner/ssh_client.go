@@ -5,21 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"runner"
 	"time"
-	"utils"
-
-	"github.com/pkg/sftp"
-
-	"path"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
-)
-
-var (
-	ErrLocalPathIsFile = "local path cannot be a file when remote path is directory"
 )
 
 type SSHClient struct {
@@ -30,7 +20,6 @@ type SSHClient struct {
 	Port       int
 	client     *ssh.Client
 	session    *ssh.Session
-	sftpClient *sftp.Client
 }
 
 func NewSSHClient(user, password, sshKeyPath, host string, port int) *SSHClient {
@@ -144,72 +133,6 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 	return nil
 }
 
-// Put transfer file/directory to remote server
-func (sc *SSHClient) Put(localPath, remotePath string) error {
-	var (
-		err           error
-		localFileInfo os.FileInfo
-	)
-
-	// create client
-	if err = sc.createClient(); err != nil {
-		return err
-	}
-	sc.sftpClient, err = sftp.NewClient(sc.client)
-	if err != nil {
-		return err
-	}
-	defer sc.sftpClient.Close()
-
-	localFileInfo, err = os.Stat(localPath)
-	if err != nil {
-		return err
-	}
-
-	if localFileInfo.IsDir() { // localPath is directory
-		if string(localPath[len(localPath)-1]) == "/" {
-			remotePath = path.Join(remotePath, path.Base(localPath))
-		}
-		return putDir(sc.sftpClient, localPath, remotePath)
-	} else { // localPath is file
-		return putFile(sc.sftpClient, localPath, remotePath)
-	}
-}
-
-// Get transfer file/directory from remote server
-func (sc *SSHClient) Get(localPath, remotePath string) error {
-	var (
-		err            error
-		remoteFileInfo os.FileInfo
-	)
-
-	// create client
-	if err = sc.createClient(); err != nil {
-		return err
-	}
-	sc.sftpClient, err = sftp.NewClient(sc.client)
-	if err != nil {
-		return err
-	}
-	defer sc.sftpClient.Close()
-
-	if remoteFileInfo, err = sc.sftpClient.Stat(remotePath); err != nil {
-		return err
-	}
-
-	if remoteFileInfo.IsDir() {
-		if string(remotePath[len(remotePath)-1]) == "/" {
-			localPath = path.Join(localPath, path.Base(remotePath))
-			os.MkdirAll(localPath, os.ModePerm)
-		}
-		return getDir(sc.sftpClient, localPath, remotePath)
-	} else {
-		return getFile(sc.sftpClient, localPath, remotePath)
-	}
-
-	return err
-}
-
 // createClient create ssh client
 func (sc *SSHClient) createClient() error {
 	var (
@@ -273,164 +196,4 @@ func authMethods(password, sshKeyPath string) ([]ssh.AuthMethod, error) {
 
 	authMethods = append(authMethods, ssh.PublicKeys(signer))
 	return authMethods, nil
-}
-
-func putFile(sftpClient *sftp.Client, localPath, remoteDir string) error {
-	filename := path.Base(localPath)
-	srcFile, err := os.Open(localPath)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	// create remote dir
-	if err := mkRemoteDirs(sftpClient, remoteDir); err != nil {
-		return err
-	}
-
-	dstFile, err := sftpClient.Create(path.Join(remoteDir, filename))
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	var fSize int64
-	if fi, err := srcFile.Stat(); err != nil {
-		return err
-	} else {
-		fSize = fi.Size()
-	}
-
-	var bufSize = 1024
-	buf := make([]byte, bufSize)
-	var i int64
-	for {
-		i++
-		nread, _ := srcFile.Read(buf)
-		if nread == 0 {
-			break
-		}
-		dstFile.Write(buf[:nread])
-
-		percent := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
-		utils.PrintFileProgress(localPath, int(percent))
-	}
-
-	return nil
-}
-
-func putDir(sftpClient *sftp.Client, localDir, remoteDir string) error {
-
-	return filepath.Walk(localDir, func(localPath string, info os.FileInfo, err error) error {
-		relPath, err := filepath.Rel(localDir, localPath)
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			// if the remote directory is existed, then omit create it
-			if err := mkRemoteDirs(sftpClient, path.Join(remoteDir, relPath)); err != nil {
-				return err
-			}
-			return nil
-		} else {
-			return putFile(sftpClient, localPath, path.Join(remoteDir, path.Dir(relPath)))
-		}
-	})
-}
-
-func isRemoteDirExisted(sftpClient *sftp.Client, remoteDir string) bool {
-	remoteFileInfo, err := sftpClient.Stat(remoteDir)
-	// TODO error type is "not found file or directory"
-	if err != nil {
-		return false
-	}
-
-	return remoteFileInfo.IsDir()
-}
-
-func mkRemoteDirs(sftpClient *sftp.Client, remoteDir string) error {
-	// create parent directory first
-	var parentDir = path.Dir(remoteDir)
-	if !isRemoteDirExisted(sftpClient, remoteDir) {
-		mkRemoteDirs(sftpClient, parentDir)
-		return sftpClient.Mkdir(remoteDir)
-	}
-	return nil
-}
-
-func getFile(sftpClient *sftp.Client, localPath, remoteFile string) error {
-
-	srcFile, err := sftpClient.Open(remoteFile)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	// localPath is directory, then localFile's name == remoteFile's name
-	localFileInfo, err := os.Stat(localPath)
-	if err == nil && localFileInfo.IsDir() {
-		localPath = path.Join(localPath, path.Base(remoteFile))
-	}
-
-	dstFile, err := os.Create(localPath)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	var fSize int64
-	if fi, err := srcFile.Stat(); err != nil {
-		return err
-	} else {
-		fSize = fi.Size()
-	}
-
-	var bufSize = 1024
-	buf := make([]byte, bufSize)
-	var i int64
-	for {
-		i++
-		nread, _ := srcFile.Read(buf)
-		if nread == 0 {
-			break
-		}
-		dstFile.Write(buf[:nread])
-
-		percent := (int64(bufSize)*(i-1) + int64(nread)) * 100 / fSize
-		utils.PrintFileProgress(localPath, int(percent))
-	}
-
-	return err
-}
-
-func getDir(sftpClient *sftp.Client, localPath, remoteDir string) error {
-	localFileInfo, err := os.Stat(localPath)
-	// remotepath is directory, localPath existed and be a file, cause error
-	if err == nil && !localFileInfo.IsDir() {
-		return fmt.Errorf(ErrLocalPathIsFile)
-	}
-
-	w := sftpClient.Walk(remoteDir)
-	for w.Step() {
-		if err = w.Err(); err != nil {
-			return err
-		}
-
-		relRemotePath, err := filepath.Rel(remoteDir, w.Path())
-		if err != nil {
-			return err
-		}
-		if w.Stat().IsDir() {
-			if err = os.MkdirAll(path.Join(localPath, relRemotePath), os.ModePerm); err != nil {
-				return err
-			}
-		} else {
-			if err = getFile(sftpClient, path.Join(localPath, relRemotePath), w.Path()); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
 }

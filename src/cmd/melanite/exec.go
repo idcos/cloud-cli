@@ -126,7 +126,7 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 	var execStart = time.Now()
 	for _, n := range nodes {
 		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", utils.FgBoldGreen(ep.Cmd), utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
-		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
 		var input = runner.ExecInput{
 			ExecHost: n.Host,
 			ExecUser: ep.User,
@@ -146,11 +146,11 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 func concurrentExecCmd(nodes []model.Node, ep execParams) error {
 	var allOutputs = make([]*runner.ExecOutput, 0)
 	var concurrentLimitChan = make(chan int, conf.Main.ConcurrentNum)
-	var outputChan = make(chan *runner.ConcurrentOutput)
+	var outputChan = make(chan *runner.ConcurrentExecOutput)
 
 	var execStart = time.Now()
 	for _, n := range nodes {
-		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port)
+		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
 		var input = runner.ExecInput{
 			ExecHost: n.Host,
 			ExecUser: ep.User,

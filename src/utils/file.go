@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
-// ErrFileExisted error message when file exist
-var ErrFileExisted = "target file %s is existed"
-
-// ErrMd5Check error message when check md5
-var ErrMd5Check = "md5 is not same: Origin MD5(%s)\tCurrent MD5(%s)"
+var (
+	// ErrFileExisted error message when file exist
+	ErrFileExisted = "target file %s is existed"
+	// ErrMd5Check error message when check md5
+	ErrMd5Check = "md5 is not same: Origin MD5(%s)\tCurrent MD5(%s)"
+)
 
 // Md5File generate md5 string
 func Md5File(filepath string) (string, error) {
@@ -53,4 +55,25 @@ func IsDir(filepath string) bool {
 	fi, err := os.Stat(filepath)
 
 	return err == nil && fi.IsDir()
+}
+
+// LocalPathSize directory size with all file in it
+func LocalPathSize(dirPath string) (int64, error) {
+	if !IsDir(dirPath) {
+		info, err := os.Stat(dirPath)
+		if err != nil {
+			return 0, err
+		}
+		return info.Size(), nil
+	}
+
+	var size int64
+	err := filepath.Walk(dirPath, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+
+	return size, err
 }

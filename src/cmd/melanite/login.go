@@ -85,7 +85,8 @@ func loginNode(groupName, nodeName string) error {
 		nodes[index].Password,
 		nodes[index].KeyPath,
 		nodes[index].Host,
-		nodes[index].Port)
+		nodes[index].Port,
+		conf.Main.FileTransBuf)
 
 	if conf.Main.LoginShell == "" {
 		return fmt.Errorf("You must set loginShell in .melanite.ini")

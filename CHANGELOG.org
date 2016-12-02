@@ -6,6 +6,12 @@
 #+OPTIONS:   ^:{}
 #+TITLE: Melanite CHANGELOG
 
+* v0.6.5 版（2016-12-02）
+1. put 并行传输远程文件，文件夹 （显示正在传输的node）
+2. get 并行传输远程文件，文件夹 （显示正在传输的node）
+3. get put 时文件传输的 buffer 大小设置
+4. 重构了 sshrunner 的代码，将文件传输部分的代码分离成单独的文件
+ 
 * v0.6.4 版（2016-11-18）
 1. get 文件夹时，--src == /path/to/testdir 只将远程文件夹testdir 中的所有文件/文件夹拷贝到本地; --src == ./testdir/ 将连同远程文件夹 testdir 本身一起拷贝到本地
 2. 所有子命令的错误移到 main 中统一处理

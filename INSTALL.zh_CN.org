@@ -39,6 +39,7 @@ sync=true         # 是否在多个node上并行执行命令  true: 串行执行
 concurrentNum=5   # 并发执行的个数，sync=false 时生效
 timeout=10        # 命令执行的timeout时间，单位是秒
 loginShell=/bin/bash # 登录远程机器后使用的shell类型
+fileTransBuf=10240   # 设置 get/put 子命令的文件传输 buffer 大小
 
 [Logger]
 level=debug       # log 等级，可以配置  debug，info，warn，error

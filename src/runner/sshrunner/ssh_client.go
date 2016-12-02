@@ -7,42 +7,32 @@ import (
 	"os"
 	"runner"
 	"time"
-	"utils"
-
-	pb "gopkg.in/cheggaaa/pb.v1"
-
-	"github.com/pkg/sftp"
-
-	"path"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 type SSHClient struct {
-	User         string
-	Password     string
-	SSHKeyPath   string
-	Host         string
-	Port         int
-	FileTransBuf int
-	client       *ssh.Client
-	session      *ssh.Session
-	sftpClient   *sftp.Client
+	User       string
+	Password   string
+	SSHKeyPath string
+	Host       string
+	Port       int
+	client     *ssh.Client
+	session    *ssh.Session
 }
 
-func NewSSHClient(user, password, sshKeyPath, host string, port, fileTransBuf int) *SSHClient {
+func NewSSHClient(user, password, sshKeyPath, host string, port int) *SSHClient {
 	if port == 0 {
 		port = 22
 	}
 
 	return &SSHClient{
-		User:         user,
-		Password:     password,
-		SSHKeyPath:   sshKeyPath,
-		Host:         host,
-		Port:         port,
-		FileTransBuf: fileTransBuf,
+		User:       user,
+		Password:   password,
+		SSHKeyPath: sshKeyPath,
+		Host:       host,
+		Port:       port,
 	}
 }
 
@@ -141,73 +131,6 @@ func (sc *SSHClient) ExecInteractiveCmd(cmd string) error {
 		return err
 	}
 	return nil
-}
-
-// Put transfer file/directory to remote server
-func (sc *SSHClient) Put(localPath, remotePath string, bar *pb.ProgressBar) error {
-	var (
-		err           error
-		localFileInfo os.FileInfo
-	)
-
-	// create client
-	if err = sc.createClient(); err != nil {
-		return err
-	}
-	sc.sftpClient, err = sftp.NewClient(sc.client)
-	if err != nil {
-		return err
-	}
-	defer sc.sftpClient.Close()
-
-	localFileInfo, err = os.Stat(localPath)
-	if err != nil {
-		return err
-	}
-
-	if localFileInfo.IsDir() { // localPath is directory
-		if string(localPath[len(localPath)-1]) == "/" {
-			remotePath = path.Join(remotePath, path.Base(localPath))
-		}
-		return utils.PutDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
-	} else { // localPath is file
-		return utils.PutFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
-	}
-}
-
-// Get transfer file/directory from remote server
-func (sc *SSHClient) Get(localPath, remotePath string, bar *pb.ProgressBar) error {
-	var (
-		err            error
-		remoteFileInfo os.FileInfo
-	)
-
-	// create client
-	if err = sc.createClient(); err != nil {
-		return err
-	}
-	sc.sftpClient, err = sftp.NewClient(sc.client)
-	if err != nil {
-		return err
-	}
-	defer sc.sftpClient.Close()
-
-	if remoteFileInfo, err = sc.sftpClient.Stat(remotePath); err != nil {
-		return err
-	}
-
-	if remoteFileInfo.IsDir() {
-		localPath = path.Join(localPath, sc.Host) // create dir by hostname
-		if string(remotePath[len(remotePath)-1]) == "/" {
-			localPath = path.Join(localPath, path.Base(remotePath))
-		}
-		os.MkdirAll(localPath, os.ModePerm)
-		return utils.GetDir(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
-	} else {
-		return utils.GetFile(sc.sftpClient, localPath, remotePath, sc.FileTransBuf, bar)
-	}
-
-	return err
 }
 
 // createClient create ssh client

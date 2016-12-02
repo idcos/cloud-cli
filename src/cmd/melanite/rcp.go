@@ -22,6 +22,10 @@ var (
 	ErrDstRequired = fmt.Errorf("option --dst is required")
 	// ErrNoNodeToRcp no more node to execute
 	ErrNoNodeToRcp = fmt.Errorf("found no node to copy file/directory")
+	// ErrLocalPath local path is not existed when put
+	ErrLocalPath = fmt.Errorf("local path is not existed")
+	// ErrRemotePath remote path is not existed when get
+	ErrRemotePath = fmt.Errorf("remote path is not existed")
 )
 
 type rcpParams struct {
@@ -31,6 +35,8 @@ type rcpParams struct {
 	Src       string
 	Dst       string
 	Yes       bool
+	PutSize   int64   // size of transfer file/directory for progressbar
+	GetSizes  []int64 // size of transfer file/directory for progressbar
 }
 
 func initRcpSubCmd(app *cli.App) {
@@ -77,7 +83,7 @@ func initRcpSubCmd(app *cli.App) {
 				return nil
 			}
 
-			var rp, err = checkRcpParams(c)
+			var rp, err = checkRcpParams(c, true)
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "put")
@@ -130,8 +136,7 @@ func initRcpSubCmd(app *cli.App) {
 				return nil
 			}
 
-			var rp, err = checkRcpParams(c)
-			fmt.Println(rp)
+			var rp, err = checkRcpParams(c, false)
 			if err != nil {
 				fmt.Println(utils.FgRed(err))
 				cli.ShowCommandHelp(c, "get")
@@ -149,7 +154,7 @@ func initRcpSubCmd(app *cli.App) {
 	}
 }
 
-func checkRcpParams(c *cli.Context) (rcpParams, error) {
+func checkRcpParams(c *cli.Context, isPut bool) (rcpParams, error) {
 	var rp = rcpParams{
 		GroupName: c.String("group"),
 		NodeNames: c.StringSlice("node"),
@@ -171,9 +176,10 @@ func checkRcpParams(c *cli.Context) (rcpParams, error) {
 }
 
 func rcpCmd(rp rcpParams, isPut bool) error {
+	var err error
 	// TODO should use sshrunner from config
 
-	// get node info for exec
+	// get node info for rcp
 	var nodes, _ = repo.FilterNodes(rp.GroupName, rp.NodeNames...)
 
 	if len(nodes) == 0 {
@@ -182,6 +188,17 @@ func rcpCmd(rp rcpParams, isPut bool) error {
 
 	if !rp.Yes && !confirmRcp(nodes, rp.User, rp.Src, rp.Dst) {
 		return nil
+	}
+
+	// check file/directory size for put/get
+	if isPut {
+		rp.PutSize, err = utils.LocalPathSize(rp.Src)
+	} else {
+		rp.GetSizes, err = getRemotePathSize(nodes, rp.Src)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	// exec cmd on node
@@ -203,6 +220,25 @@ func confirmRcp(nodes []model.Node, user, from, to string) bool {
 	fmt.Println()
 	return utils.Confirm(fmt.Sprintf("You want to copy [%s] to [%s] by UESR(%s) at the above nodes, yes/no(y/n) ?",
 		utils.FgBoldRed(from), utils.FgBoldRed(to), utils.FgBoldRed(user)))
+}
+
+func getRemotePathSize(nodes []model.Node, remotePath string) ([]int64, error) {
+	var getSizes = make([]int64, 0)
+
+	for _, n := range nodes {
+		var runRcp = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
+
+		var input = runner.RcpInput{
+			SrcPath: remotePath,
+		}
+		size, err := runRcp.RemotePathSize(input)
+		if err != nil {
+			return getSizes, err
+		}
+		getSizes = append(getSizes, size)
+	}
+	return getSizes, nil
+
 }
 
 func syncRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
@@ -241,7 +277,7 @@ func concurrentRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	pool, _ = pb.StartPool()
 
 	var rcpStart = time.Now()
-	for _, n := range nodes {
+	for index, n := range nodes {
 		var runRcp = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
 		var input = runner.RcpInput{
 			SrcPath: rp.Src,
@@ -252,8 +288,10 @@ func concurrentRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 
 		// rcp file/directory
 		if isPut {
+			input.RcpSize = rp.PutSize
 			go runRcp.ConcurrentPut(input, outputChan, concurrentLimitChan, pool)
 		} else {
+			input.RcpSize = rp.GetSizes[index]
 			go runRcp.ConcurrentGet(input, outputChan, concurrentLimitChan, pool)
 		}
 	}
@@ -271,6 +309,7 @@ func concurrentRcp(nodes []model.Node, rp rcpParams, isPut bool) error {
 	}
 
 	pool.Stop()
+	fmt.Println(utils.FgBoldBlue("==========================================================\n"))
 	displayTotalRcpResult(allOutputs, rcpStart, time.Now())
 	return nil
 }

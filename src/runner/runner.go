@@ -51,6 +51,8 @@ type RcpInput struct {
 	RcpHost string
 	// RcpUser remote user
 	RcpUser string
+	// RcpSize rcp file/directory size
+	RcpSize int64
 }
 
 type RcpOutput struct {
@@ -94,4 +96,6 @@ type IRunner interface {
 	ConcurrentPut(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool)
 	// ConcurrentGet copy file from remote server concurrency
 	ConcurrentGet(input RcpInput, outputChan chan *ConcurrentRcpOutput, limitChan chan int, pool *pb.Pool)
+	// RemotePathSize size of remote path
+	RemotePathSize(input RcpInput) (int64, error)
 }

@@ -99,18 +99,20 @@ func createConfFile() {
 	defer f.Close()
 
 	var defaultConfContent = `[Main]
-sync=true
+sync=false
 concurrentNum=5
 timeout=30
+loginShell=/bin/bash
+fileTransBuf=10240
 
 [Logger]
-level=error
-logFile=
-logType=console
+level=debug
+logFile=/tmp/cloudcli.log
+logType=file
 
 [DataSource]
 type=yaml
-conn=
+conn=~/.cloudcli.d/nodes.yaml
 `
 	f.Write([]byte(defaultConfContent))
 }

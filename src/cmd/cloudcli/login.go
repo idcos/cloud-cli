@@ -89,7 +89,7 @@ func loginNode(groupName, nodeName string) error {
 		conf.Main.FileTransBuf)
 
 	if conf.Main.LoginShell == "" {
-		return fmt.Errorf("You must set loginShell in .melanite.ini")
+		return fmt.Errorf("You must set loginShell in .cloudcli.ini")
 	}
 
 	return runCmd.Login(conf.Main.LoginShell)

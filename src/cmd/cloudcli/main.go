@@ -23,7 +23,7 @@ import (
 
 var (
 	version  = "v0.6.5"
-	confPath = ".melanite.ini"
+	confPath = ".cloudcli.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger
 	repo     *yamlrepo.YAMLRepo
@@ -38,7 +38,7 @@ func main() {
 	app := cli.NewApp()
 	app.Version = version
 	app.EnableBashCompletion = true
-	app.Name = "Melanite (CLI tool)"
+	app.Name = "CloudCli (CLI tool)"
 
 	if err := initConfig(); err != nil {
 		fmt.Println(err)

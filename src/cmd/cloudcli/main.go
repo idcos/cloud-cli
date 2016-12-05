@@ -49,6 +49,7 @@ func main() {
 	initExecSubCmd(app)
 	initLoginSubCmd(app)
 	initRcpSubCmd(app)
+	initPingSubCmd(app)
 
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)

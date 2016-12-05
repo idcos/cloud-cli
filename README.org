@@ -6,7 +6,7 @@
 #+OPTIONS:   ^:{}
 #+TITLE: CloudCli
 
-[[https://travis-ci.org/linuxr/cloudcli][https://api.travis-ci.org/linuxr/cloudcli.svg?branch=develop]]
+[[https://travis-ci.org/linuxr/cloud-cli][https://api.travis-ci.org/linuxr/cloud-cli.svg?branch=develop]]
 [[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/language-Go-orange.svg]]
 [[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/copyright-Iota%20Labs-red.svg]]
 [[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/license-MIT-blue.svg]]

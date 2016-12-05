@@ -4,32 +4,32 @@
 #+OPTIONS: html-postamble:nil
 #+LANGUAGE: zh-CN
 #+OPTIONS:   ^:{}
-#+TITLE: melanite 安装方法
+#+TITLE: cloudcli 安装方法
 
 * 下载源码编译
 本工程是用 gb 编译的，gb 首页：https://getgb.io/
 
 下载编译：
 #+BEGIN_SRC sh
-git clone https://github.com/iotalabs/melanite.git
-cd melanite
+git clone https://github.com/iotalabs/cloudcli.git
+cd cloudcli
 gb build
 #+END_SRC
 
-编译完成后，为了方便以后使用，可以将 bin 目录下的二进制文件 melanite 放在系统 PATH 中。
+编译完成后，为了方便以后使用，可以将 bin 目录下的二进制文件 cloudcli 放在系统 PATH 中。
 
 * 首次使用
 首次使用时会提示创建配置文件，如果打算继续使用，请选择 *y*
 #+BEGIN_SRC sh
-$ melanite
+$ cloudcli
 Do you want to create your config file?(y or n)y
-You should set DataSource in your config file: /path/to/you/home/.melanite.ini
+You should set DataSource in your config file: /path/to/you/home/.cloudcli.ini
 #+END_SRC
 
-生成的配置文件(.melanite.ini)中各项说明参见下面的小节 *配置文件说明*
+生成的配置文件(.cloudcli.ini)中各项说明参见下面的小节 *配置文件说明*
 
 * 使用方式
-melanite 命令支持的子命令和各个参数请参见：[[file:doc/melanite_commands.org][命令使用说明]]
+cloudcli 命令支持的子命令和各个参数请参见：[[file:doc/cloudcli_commands.org][命令使用说明]]
 
 * 配置文件说明
   配置文件示例：

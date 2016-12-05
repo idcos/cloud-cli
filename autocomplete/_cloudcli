@@ -1,6 +1,6 @@
-#compdef melanite
+#compdef cloudcli
 
-_melanite() {
+_cloudcli() {
     local curcontext="$curcontext" state line
     typeset -A opt_args
 
@@ -20,41 +20,41 @@ _melanite() {
                 'get:Transfer file from remote server.'
                 'help:Print help info.'
             )
-            _describe -t commands 'melanite' subcommands
+            _describe -t commands 'cloudcli' subcommands
             ;;
 
         (options)
             case $line[1] in
 
                 (list)
-                    __melanite_list
+                    __cloudcli_list
                     ;;
 
                 (exec)
-                    __melanite_exec
+                    __cloudcli_exec
                     ;;
 
                 (login)
-                    __melanite_login
+                    __cloudcli_login
                     ;;
 
                 (put)
-                    __melanite_put
+                    __cloudcli_put
                     ;;
 
                 (get)
-                    __melanite_get
+                    __cloudcli_get
                     ;;
 
                 (help)
-                    __melanite_help
+                    __cloudcli_help
                     ;;
             esac
             ;;
     esac
 }
 
-__melanite_help() {
+__cloudcli_help() {
     _arguments -C \
                ':command:->command'
 
@@ -69,14 +69,14 @@ __melanite_help() {
                 'put:Put subcommand.'
                 'get:Get subcommand.'
             )
-            _describe -t commands 'melanite help' subcommands
+            _describe -t commands 'cloudcli help' subcommands
             ;;
     esac
 
 }
 
 
-__melanite_list() {
+__cloudcli_list() {
 
     _arguments -C -s -S \
                '-n[remote node name]:node name:__generate_nodes' \
@@ -87,7 +87,7 @@ __melanite_list() {
 
 }
 
-__melanite_exec() {
+__cloudcli_exec() {
 
     _arguments -C -s -S \
                '-n[remote node name]:node name:__generate_nodes' \
@@ -100,7 +100,7 @@ __melanite_exec() {
 
 }
 
-__melanite_login() {
+__cloudcli_login() {
 
     _arguments -C -s -S \
                '-n[remote node name]:node name:__generate_nodes' \
@@ -110,7 +110,7 @@ __melanite_login() {
 
 }
 
-__melanite_put() {
+__cloudcli_put() {
 
     _arguments -C -s -S \
                '-n[remote node name]:node name:__generate_nodes' \
@@ -124,7 +124,7 @@ __melanite_put() {
 
 }
 
-__melanite_get() {
+__cloudcli_get() {
 
     _arguments -C -s -S \
                '-n[remote node name]:node name:__generate_nodes' \
@@ -140,17 +140,17 @@ __melanite_get() {
 
 __generate_nodes() {
     local expl
-    nodes=( `melanite get -n --generate-bash-completion` )
+    nodes=( `cloudcli get -n --generate-bash-completion` )
 
     _wanted nodes expl node compadd $* - $nodes
 }
 
 __generate_groups() {
     local expl
-    groups=( `melanite get -g --generate-bash-completion` )
+    groups=( `cloudcli get -g --generate-bash-completion` )
 
     _wanted groups expl group compadd $* - $groups
 }
 
-_melanite "$@"
+_cloudcli "$@"
 

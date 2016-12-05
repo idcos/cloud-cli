@@ -4,15 +4,15 @@
 #+OPTIONS: html-postamble:nil
 #+LANGUAGE: zh-CN
 #+OPTIONS:   ^:{}
-#+TITLE: Melanite command introduction
+#+TITLE: CloudCli command introduction
 
-* melanite command
+* cloudcli command
 #+BEGIN_EXAMPLE
 NAME:
-   Melanite (CLI tool) - A new cli application
+   Cloudcli (CLI tool) - A new cli application
 
 USAGE:
-   melanite [global options] command [command options] [arguments...]
+   cloudcli [global options] command [command options] [arguments...]
 
 VERSION:
    v0.5.0
@@ -30,10 +30,10 @@ GLOBAL OPTIONS:
 * subcommand _list_
 #+BEGIN_EXAMPLE
 NAME:
-   melanite list - list <options>
+   cloudcli list - list <options>
 
 USAGE:
-   melanite list [command options] [arguments...]
+   cloudcli list [command options] [arguments...]
 
 DESCRIPTION:
    list groups and nodes
@@ -47,10 +47,10 @@ OPTIONS:
 * subcommand _exec_
 #+BEGIN_EXAMPLE
 NAME:
-   melanite exec - exec <options>
+   cloudcli exec - exec <options>
 
 USAGE:
-   melanite exec [command options] [arguments...]
+   cloudcli exec [command options] [arguments...]
 
 DESCRIPTION:
    exec command on groups or nodes
@@ -66,10 +66,10 @@ OPTIONS:
 * subcommand _login_
 #+BEGIN_EXAMPLE
 NAME:
-   melanite login - login <options>
+   cloudcli login - login <options>
 
 USAGE:
-   melanite login [command options] [arguments...]
+   cloudcli login [command options] [arguments...]
 
 DESCRIPTION:
    login to one node
@@ -82,10 +82,10 @@ OPTIONS:
 * subcommand _put_
 #+BEGIN_EXAMPLE
 NAME:
-   melanite put - put <options>
+   cloudcli put - put <options>
 
 USAGE:
-   melanite put [command options] [arguments...]
+   cloudcli put [command options] [arguments...]
 
 DESCRIPTION:
    copy file or directory to remote servers
@@ -102,10 +102,10 @@ OPTIONS:
 * subcommand _get_
 #+BEGIN_EXAMPLE
 NAME:
-   melanite get - get <options>
+   cloudcli get - get <options>
 
 USAGE:
-   melanite get [command options] [arguments...]
+   cloudcli get [command options] [arguments...]
 
 DESCRIPTION:
    copy file or directory from remote servers

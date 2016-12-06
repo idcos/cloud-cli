@@ -1,0 +1,172 @@
+#compdef cloudcli
+
+_cloudcli() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments -C \
+               ':command:->command' \
+               '*::options:->options'
+
+    case $state in
+        (command)
+
+            local -a subcommands
+            subcommands=(
+                'list:List host info.'
+                'exec:Exec command to remote servers.'
+                'login:Login to remote server.'
+                'put:Transfer file to remote server.'
+                'get:Transfer file from remote server.'
+                'ping:Ping remote server.'
+                'help:Print help info.'
+            )
+            _describe -t commands 'cloudcli' subcommands
+            ;;
+
+        (options)
+            case $line[1] in
+
+                (list)
+                    __cloudcli_list
+                    ;;
+
+                (exec)
+                    __cloudcli_exec
+                    ;;
+
+                (login)
+                    __cloudcli_login
+                    ;;
+
+                (put)
+                    __cloudcli_put
+                    ;;
+
+                (get)
+                    __cloudcli_get
+                    ;;
+
+                (ping)
+                    __cloudcli_ping
+                    ;;
+
+                (help)
+                    __cloudcli_help
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+__cloudcli_help() {
+    _arguments -C \
+               ':command:->command'
+
+    case $state in
+        (command)
+
+            local -a subcommands
+            subcommands=(
+                'list:List subcommand.'
+                'exec:Exec subcommand.'
+                'login:Login subcommand.'
+                'put:Put subcommand.'
+                'get:Get subcommand.'
+                'ping:Ping subcommand.'
+            )
+            _describe -t commands 'cloudcli help' subcommands
+            ;;
+    esac
+
+}
+
+
+__cloudcli_list() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups' \
+               {'-a','--all'}'[display detail info]::'
+
+}
+
+__cloudcli_exec() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups' \
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               {'-c','--cmd'}'[command for exec]::'
+
+}
+
+__cloudcli_login() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups'
+
+}
+
+__cloudcli_put() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups' \
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               '--src[source file or directory]:file path:_files' \
+               '--dst[destination *directory*]:file path:_files'
+
+}
+
+__cloudcli_get() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups' \
+               {'-u','--user'}'[user who exec the command]::' \
+               {'-y','--yes'}'[is confirm before excute command?]::' \
+               '--src[source file or directory]:file path:_files' \
+               '--dst[destination *directory*]:file path:_files'
+
+}
+
+__cloudcli_ping() {
+
+    _arguments -C -s -S \
+               '-n[remote node name]:node name:__generate_nodes' \
+               '--node[remote node name]:node name:__generate_nodes' \
+               '-g[group name]:group name:__generate_groups' \
+               '--group[group name]:group name:__generate_groups'
+
+}
+
+__generate_nodes() {
+    local expl
+    nodes=( `cloudcli get -n --generate-bash-completion` )
+
+    _wanted nodes expl node compadd $* - $nodes
+}
+
+__generate_groups() {
+    local expl
+    groups=( `cloudcli get -g --generate-bash-completion` )
+
+    _wanted groups expl group compadd $* - $groups
+}
+
+_cloudcli "$@"
+

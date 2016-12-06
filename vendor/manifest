@@ -63,6 +63,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/tatsushid/go-fastping",
+			"repository": "https://github.com/tatsushid/go-fastping",
+			"revision": "d7bb493dee3e090e2ffb6914adddf17c1e7c026c",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/tredoe/term/sys",
 			"repository": "https://github.com/tredoe/term",
 			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",
@@ -95,6 +101,48 @@
 			"revision": "5bcd134fee4dd1475da17714aac19c0aa0142e2f",
 			"branch": "master",
 			"path": "/ssh"
+		},
+		{
+			"importpath": "golang.org/x/net/bpf",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/bpf"
+		},
+		{
+			"importpath": "golang.org/x/net/icmp",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/icmp"
+		},
+		{
+			"importpath": "golang.org/x/net/internal/iana",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/internal/iana"
+		},
+		{
+			"importpath": "golang.org/x/net/internal/netreflect",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/internal/netreflect"
+		},
+		{
+			"importpath": "golang.org/x/net/ipv4",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/ipv4"
+		},
+		{
+			"importpath": "golang.org/x/net/ipv6",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
+			"branch": "master",
+			"path": "/ipv6"
 		},
 		{
 			"importpath": "golang.org/x/sys/unix",

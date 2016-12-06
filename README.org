@@ -4,12 +4,12 @@
 #+OPTIONS: html-postamble:nil
 #+LANGUAGE: zh-CN
 #+OPTIONS:   ^:{}
-#+TITLE: Melanite
+#+TITLE: CloudCli
 
-[[https://travis-ci.org/iotalabs/melanite][https://api.travis-ci.org/iotalabs/melanite.svg?branch=develop]]
-[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/language-Go-orange.svg]]
-[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/copyright-Iota%20Labs-red.svg]]
-[[https://github.com/iotalabs/pioneer][https://img.shields.io/badge/license-MIT-blue.svg]]
+[[https://travis-ci.org/linuxr/cloud-cli][https://api.travis-ci.org/linuxr/cloud-cli.svg?branch=develop]]
+[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/language-Go-orange.svg]]
+[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/copyright-idcos-red.svg]]
+[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/license-MIT-blue.svg]]
 
 * 概述
 利用SSH协议，远程执行命令的命令行工具。
@@ -28,7 +28,7 @@
 ** 登录远程机器
 登录远程机器，相当于一个简单的 ssh 客户端。
 
-直接使用命令 ~melanite login~ 时，会在 vim 中列出所有可登录的机器信息，
+直接使用命令 ~cloudcli login~ 时，会在 vim 中列出所有可登录的机器信息，
 
 利用vim的检索功能搜索到某个功能时，直接 Enter 登录。
 
@@ -45,9 +45,9 @@ put 文件/文件夹 到远程机器。
 
 示例：以下命令表示执行 [CmdAlias] section 中的第一条命令 （[CmdAlias] section 的配置方法参见 [[file:INSTALL.zh_CN.org::%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E][配置文件说明]]）
 #+BEGIN_SRC sh
-melanite exec -g dgroup01 -n dgnode01 -c 1
+cloudcli exec -g dgroup01 -n dgnode01 -c 1
 或者
-melanite exec -g dgroup01 -n dgnode01 -c '#1'
+cloudcli exec -g dgroup01 -n dgnode01 -c '#1'
 #+END_SRC
 
 ** 主机分组
@@ -95,13 +95,13 @@ NodeGroups:
      #+END_SRC
    - 在 上述的路径之一中，创建连接 自动补全脚本的软链接（或者直接将自动补全脚本放入上面的任一路径之中）
      #+BEGIN_SRC sh
-     ln -s /path/to/melanite/autocomplete/_melanite /path/of/fpath/_melanite
+     ln -s /path/to/cloudcli/autocomplete/_cloudcli /path/of/fpath/_cloudcli
      #+END_SRC
  
 2. BASH 环境下
    把下面的代码加入到 .bashrc
    #+BEGIN_SRC sh
-   source /path/to/melanite/autocomplete/bash_completion
+   source /path/to/cloudcli/autocomplete/bash_completion
    #+END_SRC
 
 补充：
@@ -111,6 +111,20 @@ NodeGroups:
 2. 使用前安装 bash-completion package，Mac 下安装方式如下：
    #+BEGIN_SRC sh
    brew install bash-completion
+   #+END_SRC
+
+** 主机连通性检查（ping）
+   检查主机是否能够 ping 通时，可以使用下面的子命令：
+   #+BEGIN_SRC sh
+   cloudcli ping
+   cloudcli ping -g <groupName>
+   cloudcli ping -n <nodeName>
+   cloudcli ping -g <groupName> -n <nodeName>
+   #+END_SRC
+   
+   *注意* 在linux系统上，如果使用非 root 用户执行上面的 ping 子命令，可能会有权限不足的错误，通过以下方法修复：
+   #+BEGIN_SRC sh
+   sudo sysctl -w net.ipv4.ping_group_range="0 65535"
    #+END_SRC
 
 * License

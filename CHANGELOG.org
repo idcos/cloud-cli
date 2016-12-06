@@ -4,7 +4,12 @@
 #+OPTIONS: html-postamble:nil
 #+LANGUAGE: zh-CN
 #+OPTIONS:   ^:{}
-#+TITLE: Melanite CHANGELOG
+#+TITLE: CloudCli CHANGELOG
+
+* v0.7.0 版（2016-12-06）
+1. 命令行的名称改为 cloudcli
+2. 追加 ping 功能，测试远程服务器是否连通
+3. 首次使用时，配置文件自动初始化
 
 * v0.6.5 版（2016-12-02）
 1. put 并行传输远程文件，文件夹 （显示正在传输的node）
@@ -39,7 +44,7 @@
 
 * v0.5.0 版（2016-05-29）
 1. list 自动补全 -g 和 -n 参数
-2. 可以配置常用命令，.melanite 中添加 [CmdAlias] section
+2. 可以配置常用命令，.cloudcli 中添加 [CmdAlias] section
 3. 增加 login 子命令，通过 login 可以登录到某台机器的 bash 上去
 
 * v0.4.0 版（2016-05-22）
@@ -56,18 +61,18 @@
 1. exec 子命令 支持多个 -n 参数
    示例： 
    #+BEGIN_SRC sh
-   melanite exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime'
+   cloudcli exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime'
    #+END_SRC
 2. exec 子命令 加入 -y/--yes 参数，此参数表示可以不用确认，直接执行
    示例： 
    #+BEGIN_SRC sh
-   melanite exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime' -y
+   cloudcli exec -g 'group*' -n 'node1' -n 'node2' -c 'uptime' -y
    #+END_SRC
 3. exec 子命令批量执行时，执行失败的节点和成功的节点之间加入分隔
 4. list 子命令 加入 -a/--all 参数，显示 node的所有信息
    示例：
    #+BEGIN_SRC sh
-   melanite list -a
+   cloudcli list -a
    #+END_SRC
 5. exec 子命令可以自动补全 -g 和 -n option 后面的内容
 

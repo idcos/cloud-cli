@@ -83,6 +83,7 @@ func ping(host string) bool {
 	p.OnIdle = func() {}
 
 	if err := p.Run(); err != nil {
+		log.Error("ping error: %v\n", err)
 		pingResult = false
 	}
 	<-p.Done()

@@ -113,6 +113,20 @@ NodeGroups:
    brew install bash-completion
    #+END_SRC
 
+** 主机连通性检查（ping）
+   检查主机是否能够 ping 通时，可以使用下面的子命令：
+   #+BEGIN_SRC sh
+   cloudcli ping
+   cloudcli ping -g <groupName>
+   cloudcli ping -n <nodeName>
+   cloudcli ping -g <groupName> -n <nodeName>
+   #+END_SRC
+   
+   *注意* 在linux系统上，如果使用非 root 用户执行上面的 ping 子命令，可能会有权限不足的错误，通过以下方法修复：
+   #+BEGIN_SRC sh
+   sudo sysctl -w net.ipv4.ping_group_range="0 65535"
+   #+END_SRC
+
 * License
 MIT License 2016 (Iota Labs)
 

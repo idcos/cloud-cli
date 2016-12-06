@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"time"
 	"utils"
 
+	fastping "github.com/tatsushid/go-fastping"
 	"github.com/urfave/cli"
 )
 
@@ -52,7 +55,7 @@ func pingNodes(groupName, nodeName string) error {
 	}
 
 	for _, n := range nodes {
-		if pingTimes(n.Host, 30) {
+		if ping(n.Host) {
 			fmt.Printf("%-30s--------------------[%s]\n", n.Host, utils.FgBoldGreen("OK"))
 		} else {
 			fmt.Printf("%-30s--------------------[%s]\n", n.Host, utils.FgBoldRed("NG"))
@@ -61,13 +64,28 @@ func pingNodes(groupName, nodeName string) error {
 	return nil
 }
 
-func pingTimes(host string, times int) bool {
+func ping(host string) bool {
+	p := fastping.NewPinger()
+	p.Network("udp")
+	p.MaxRTT = time.Second
 
-	for i := 0; i < times; i++ {
-		if utils.Ping(host, 2) {
-			return true
-		}
+	ra, err := net.ResolveIPAddr("ip4:icmp", host)
+	if err != nil {
+		fmt.Println(err)
+		return false
 	}
+	p.AddIPAddr(ra)
 
-	return false
+	var pingResult = false
+	p.OnRecv = func(addr *net.IPAddr, t time.Duration) {
+		pingResult = true
+	}
+	p.OnIdle = func() {}
+
+	if err := p.Run(); err != nil {
+		pingResult = false
+	}
+	<-p.Done()
+
+	return pingResult
 }

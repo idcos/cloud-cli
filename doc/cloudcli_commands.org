@@ -118,3 +118,19 @@ OPTIONS:
    -u value, --user value       user who exec the command (default: "root")
    -y, --yes                    is confirm before excute command?
 #+END_EXAMPLE
+
+* subcommand _ping_
+#+BEGIN_EXAMPLE
+NAME:
+   cloudcli ping - ping <option>
+
+USAGE:
+   cloudcli ping [command options] [arguments...]
+
+DESCRIPTION:
+   ping nodes
+
+OPTIONS:
+   -g value, --group value      list group and it's nodes (default: "*")
+   -n value, --node value       list nodes (default: "*")
+#+END_EXAMPLE

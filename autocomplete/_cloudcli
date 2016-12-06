@@ -73,6 +73,7 @@ __cloudcli_help() {
                 'login:Login subcommand.'
                 'put:Put subcommand.'
                 'get:Get subcommand.'
+                'ping:Ping subcommand.'
             )
             _describe -t commands 'cloudcli help' subcommands
             ;;

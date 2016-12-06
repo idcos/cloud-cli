@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version  = "v0.6.5"
+	version  = "v0.7.0"
 	confPath = ".cloudcli.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger

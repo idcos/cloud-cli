@@ -6,10 +6,10 @@
 #+OPTIONS:   ^:{}
 #+TITLE: CloudCli
 
-[[https://travis-ci.org/linuxr/cloud-cli][https://api.travis-ci.org/linuxr/cloud-cli.svg?branch=develop]]
-[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/language-Go-orange.svg]]
-[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/copyright-idcos-red.svg]]
-[[https://github.com/linuxr/cloud-cli][https://img.shields.io/badge/license-MIT-blue.svg]]
+[[https://travis-ci.org/idcos/cloud-cli][https://api.travis-ci.org/idcos/cloud-cli.svg?branch=develop]]
+[[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/language-Go-orange.svg]]
+[[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/copyright-idcos-red.svg]]
+[[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/license-MIT-blue.svg]]
 
 * 概述
 利用SSH协议，远程执行命令的命令行工具。

@@ -6,7 +6,6 @@
 #+OPTIONS:   ^:{}
 #+TITLE: CloudCli
 
-[[https://travis-ci.org/idcos/cloud-cli][https://api.travis-ci.org/idcos/cloud-cli.svg?branch=develop]]
 [[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/language-Go-orange.svg]]
 [[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/copyright-idcos-red.svg]]
 [[https://github.com/idcos/cloud-cli][https://img.shields.io/badge/license-MIT-blue.svg]]

@@ -1,0 +1,15 @@
+{
+  "presets": [
+    "es2015",
+    "react",
+    "stage-1"
+  ],
+  "plugins": ["babel-plugin-transform-decorators-legacy", ["import", { "libraryName": "antd", "style": true }]],
+  "env": {
+    "development": {
+      "presets": [
+        "react-hmre"
+      ]
+    }
+  }
+}

@@ -2,11 +2,29 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/BurntSushi/toml",
+			"repository": "https://github.com/BurntSushi/toml",
+			"revision": "99064174e013895bbd9b025c31100bd1d9b590ca",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/astaxie/beego/logs",
 			"repository": "https://github.com/astaxie/beego",
 			"revision": "88c5dfa6ead42e624c2e7d9e04eab6cb2d07412a",
 			"branch": "master",
 			"path": "/logs"
+		},
+		{
+			"importpath": "github.com/beego/goyaml2",
+			"repository": "https://github.com/beego/goyaml2",
+			"revision": "5545475820ddd4db3f90a4900d44b65d077d702d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/beego/x2j",
+			"repository": "https://github.com/beego/x2j",
+			"revision": "a0352aadc5420072ebe692481a5d6913d77f8cf0",
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/belogik/goes",
@@ -15,9 +33,73 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/bradfitz/gomemcache/memcache",
+			"repository": "https://github.com/bradfitz/gomemcache",
+			"revision": "2fafb84a66c4911e11a8f50955b01e74fe3ab9c5",
+			"branch": "master",
+			"path": "/memcache"
+		},
+		{
+			"importpath": "github.com/couchbase/go-couchbase",
+			"repository": "https://github.com/couchbase/go-couchbase",
+			"revision": "276a412947426396a0595c32b25984029fa64f04",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/couchbase/gomemcached",
+			"repository": "https://github.com/couchbase/gomemcached",
+			"revision": "832858c5df7b06c4d1df2b0d98e0a4213416a500",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/couchbase/goutils/logging",
+			"repository": "https://github.com/couchbase/goutils",
+			"revision": "5823a0cbaaa9008406021dc5daf80125ea30bba6",
+			"branch": "master",
+			"path": "/logging"
+		},
+		{
+			"importpath": "github.com/cupcake/rdb",
+			"repository": "https://github.com/cupcake/rdb",
+			"revision": "43ba34106c765f2111c0dc7b74cdf8ee437411e0",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/edsrzf/mmap-go",
+			"repository": "https://github.com/edsrzf/mmap-go",
+			"revision": "935e0e8a636ca4ba70b713f3e38a19e1b77739e8",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/fatih/color",
 			"repository": "https://github.com/fatih/color",
 			"revision": "533cd7fd8a85905f67a1753afb4deddc85ea174f",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/garyburd/redigo/internal",
+			"repository": "https://github.com/garyburd/redigo",
+			"revision": "d7de57ceb51b029d5c5a61e26587f672e2834178",
+			"branch": "master",
+			"path": "/internal"
+		},
+		{
+			"importpath": "github.com/garyburd/redigo/redis",
+			"repository": "https://github.com/garyburd/redigo",
+			"revision": "d7de57ceb51b029d5c5a61e26587f672e2834178",
+			"branch": "master",
+			"path": "/redis"
+		},
+		{
+			"importpath": "github.com/go-sql-driver/mysql",
+			"repository": "https://github.com/go-sql-driver/mysql",
+			"revision": "a0583e0143b1624142adab07e0e97fe106d99561",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/golang/snappy",
+			"repository": "https://github.com/golang/snappy",
+			"revision": "d9eb7a3d35ec988b8585d4a0068e462c27d28380",
 			"branch": "master"
 		},
 		{
@@ -30,6 +112,12 @@
 			"importpath": "github.com/kr/fs",
 			"repository": "https://github.com/kr/fs",
 			"revision": "2788f0dbd16903de03cb8186e5c7d97b69ad387b",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/lib/pq",
+			"repository": "https://github.com/lib/pq",
+			"revision": "4a82388ebc5138c8289fe9bc602cb0b3e32cd617",
 			"branch": "master"
 		},
 		{
@@ -61,6 +149,103 @@
 			"repository": "https://github.com/pkg/sftp",
 			"revision": "a71e8f580e3b622ebff585309160b1cc549ef4d2",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/siddontang/go/filelock",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/filelock"
+		},
+		{
+			"importpath": "github.com/siddontang/go/hack",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/hack"
+		},
+		{
+			"importpath": "github.com/siddontang/go/ioutil2",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/ioutil2"
+		},
+		{
+			"importpath": "github.com/siddontang/go/log",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/log"
+		},
+		{
+			"importpath": "github.com/siddontang/go/num",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/num"
+		},
+		{
+			"importpath": "github.com/siddontang/go/snappy",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/snappy"
+		},
+		{
+			"importpath": "github.com/siddontang/go/sync2",
+			"repository": "https://github.com/siddontang/go",
+			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
+			"branch": "master",
+			"path": "/sync2"
+		},
+		{
+			"importpath": "github.com/siddontang/ledisdb/config",
+			"repository": "https://github.com/siddontang/ledisdb",
+			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
+			"branch": "master",
+			"path": "/config"
+		},
+		{
+			"importpath": "github.com/siddontang/ledisdb/ledis",
+			"repository": "https://github.com/siddontang/ledisdb",
+			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
+			"branch": "master",
+			"path": "/ledis"
+		},
+		{
+			"importpath": "github.com/siddontang/ledisdb/rpl",
+			"repository": "https://github.com/siddontang/ledisdb",
+			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
+			"branch": "master",
+			"path": "/rpl"
+		},
+		{
+			"importpath": "github.com/siddontang/ledisdb/store",
+			"repository": "https://github.com/siddontang/ledisdb",
+			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
+			"branch": "master",
+			"path": "/store"
+		},
+		{
+			"importpath": "github.com/siddontang/rdb",
+			"repository": "https://github.com/siddontang/rdb",
+			"revision": "fc89ed2e418d27e3ea76e708e54276d2b44ae9cf",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/ssdb/gossdb/ssdb",
+			"repository": "https://github.com/ssdb/gossdb",
+			"revision": "a19fc4ae2aa1889d4d7a1e2279ed5907825c8215",
+			"branch": "master",
+			"path": "/ssdb"
+		},
+		{
+			"importpath": "github.com/syndtr/goleveldb/leveldb",
+			"repository": "https://github.com/syndtr/goleveldb",
+			"revision": "6b4daa5362b502898ddf367c5c11deb9e7a5c727",
+			"branch": "master",
+			"path": "/leveldb"
 		},
 		{
 			"importpath": "github.com/tatsushid/go-fastping",

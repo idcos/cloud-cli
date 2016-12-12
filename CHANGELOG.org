@@ -6,6 +6,10 @@
 #+OPTIONS:   ^:{}
 #+TITLE: CloudCli CHANGELOG
 
+* v0.7.1 版（2016-12-12）
+1. 迁移项目到 idcos organization
+3. version 问题，编译时用 编译参数的方式，注入git revision number
+
 * v0.7.0 版（2016-12-06）
 1. 命令行的名称改为 cloudcli
 2. 追加 ping 功能，测试远程服务器是否连通

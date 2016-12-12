@@ -15,29 +15,10 @@
 			"path": "/logs"
 		},
 		{
-			"importpath": "github.com/beego/goyaml2",
-			"repository": "https://github.com/beego/goyaml2",
-			"revision": "5545475820ddd4db3f90a4900d44b65d077d702d",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/beego/x2j",
-			"repository": "https://github.com/beego/x2j",
-			"revision": "a0352aadc5420072ebe692481a5d6913d77f8cf0",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/belogik/goes",
 			"repository": "https://github.com/belogik/goes",
 			"revision": "e54d722c3aff588e4c737fe11c07359019240824",
 			"branch": "master"
-		},
-		{
-			"importpath": "github.com/bradfitz/gomemcache/memcache",
-			"repository": "https://github.com/bradfitz/gomemcache",
-			"revision": "2fafb84a66c4911e11a8f50955b01e74fe3ab9c5",
-			"branch": "master",
-			"path": "/memcache"
 		},
 		{
 			"importpath": "github.com/couchbase/go-couchbase",
@@ -91,21 +72,9 @@
 			"path": "/redis"
 		},
 		{
-			"importpath": "github.com/go-sql-driver/mysql",
-			"repository": "https://github.com/go-sql-driver/mysql",
-			"revision": "a0583e0143b1624142adab07e0e97fe106d99561",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/golang/snappy",
 			"repository": "https://github.com/golang/snappy",
 			"revision": "d9eb7a3d35ec988b8585d4a0068e462c27d28380",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/kless/term",
-			"repository": "https://github.com/kless/term",
-			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",
 			"branch": "master"
 		},
 		{
@@ -207,13 +176,6 @@
 			"path": "/config"
 		},
 		{
-			"importpath": "github.com/siddontang/ledisdb/ledis",
-			"repository": "https://github.com/siddontang/ledisdb",
-			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
-			"branch": "master",
-			"path": "/ledis"
-		},
-		{
 			"importpath": "github.com/siddontang/ledisdb/rpl",
 			"repository": "https://github.com/siddontang/ledisdb",
 			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
@@ -232,13 +194,6 @@
 			"repository": "https://github.com/siddontang/rdb",
 			"revision": "fc89ed2e418d27e3ea76e708e54276d2b44ae9cf",
 			"branch": "master"
-		},
-		{
-			"importpath": "github.com/ssdb/gossdb/ssdb",
-			"repository": "https://github.com/ssdb/gossdb",
-			"revision": "a19fc4ae2aa1889d4d7a1e2279ed5907825c8215",
-			"branch": "master",
-			"path": "/ssdb"
 		},
 		{
 			"importpath": "github.com/syndtr/goleveldb/leveldb",

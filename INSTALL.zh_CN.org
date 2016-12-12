@@ -11,7 +11,7 @@
 
 下载编译：
 #+BEGIN_SRC sh
-git clone https://github.com/iotalabs/cloudcli.git
+git clone https://github.com/idcos/cloudcli.git
 cd cloudcli
 gb build
 #+END_SRC

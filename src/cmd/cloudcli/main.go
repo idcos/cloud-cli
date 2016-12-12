@@ -22,7 +22,8 @@ import (
 )
 
 var (
-	version  = "v0.7.0"
+	version  = "v0.7.1"
+	build    = "not set"
 	confPath = ".cloudcli.ini"
 	conf     *config.Config
 	log      *logs.BeeLogger
@@ -36,7 +37,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Version = version
+	app.Version = fmt.Sprintf("%s\nbuild: %s", version, build)
 	app.EnableBashCompletion = true
 	app.Name = "CloudCli (CLI tool)"
 

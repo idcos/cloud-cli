@@ -9,17 +9,19 @@ LD_FLAGS := "-X main.build=$(CURRENT_REVISION)"
 
 TARGET_CLOUDCLI = cmd/cloudcli
 BIN_CLOLUDCLI = ./bin/cloudcli
+RELEASE_DIR = ./release
 
 # target
-all:
-	@echo "[begin] build all ==================="
-	rm -f $(BIN_CLOLUDCLI)
-	$(GB) build -ldflags $(LD_FLAGS) $(TARGET_CLOUDCLI)
-	@echo "[end  ] build all ==================="
+all: cli
 
-cli:
+release: cli
+	@echo "[begin] release ==================="
+	-mkdir $(RELEASE_DIR)
+	cp $(BIN_CLOLUDCLI) $(RELEASE_DIR)
+	@echo "[end]   release ==================="
+
+cli: clean
 	@echo "[begin] build cloudcli ==================="
-	rm -f $(BIN_CLOLUDCLI)
 	$(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
 	@echo "[end  ] build cloudcli ==================="
 
@@ -27,3 +29,5 @@ cli:
 clean:
 	rm -f $(BIN_CLOLUDCLI)
 
+clean_release:
+	rm -rf $(RELEASE_DIR)

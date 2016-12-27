@@ -6,6 +6,8 @@ import (
 	"time"
 	"utils"
 
+	"strings"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -125,5 +127,12 @@ func (sr *SSHRunner) RemotePathSize(input runner.RcpInput) (int64, error) {
 }
 
 func compositCommand(input runner.ExecInput) string {
-	return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
+	if input.ExecUser == "" {
+		return input.Command
+	}
+	if strings.Index(input.Command, `'`) == -1 {
+		return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
+	} else {
+		return fmt.Sprintf(`su - "%s" -c "%s"`, input.ExecUser, input.Command)
+	}
 }

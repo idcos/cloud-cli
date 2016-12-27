@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version  = "v0.7.1"
+	version  = "v0.7.2"
 	build    = "not set"
 	confPath = ".cloudcli.ini"
 	conf     *config.Config

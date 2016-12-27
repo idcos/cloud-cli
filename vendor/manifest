@@ -120,20 +120,6 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/siddontang/go/filelock",
-			"repository": "https://github.com/siddontang/go",
-			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
-			"branch": "master",
-			"path": "/filelock"
-		},
-		{
-			"importpath": "github.com/siddontang/go/hack",
-			"repository": "https://github.com/siddontang/go",
-			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
-			"branch": "master",
-			"path": "/hack"
-		},
-		{
 			"importpath": "github.com/siddontang/go/ioutil2",
 			"repository": "https://github.com/siddontang/go",
 			"revision": "1e9ce2a5ac4092fdf61e293634e40bfb49595105",
@@ -176,24 +162,11 @@
 			"path": "/config"
 		},
 		{
-			"importpath": "github.com/siddontang/ledisdb/rpl",
-			"repository": "https://github.com/siddontang/ledisdb",
-			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
-			"branch": "master",
-			"path": "/rpl"
-		},
-		{
 			"importpath": "github.com/siddontang/ledisdb/store",
 			"repository": "https://github.com/siddontang/ledisdb",
 			"revision": "380835a0ca70929fb26d78f57444efaaf44abcac",
 			"branch": "master",
 			"path": "/store"
-		},
-		{
-			"importpath": "github.com/siddontang/rdb",
-			"repository": "https://github.com/siddontang/rdb",
-			"revision": "fc89ed2e418d27e3ea76e708e54276d2b44ae9cf",
-			"branch": "master"
 		},
 		{
 			"importpath": "github.com/syndtr/goleveldb/leveldb",
@@ -207,13 +180,6 @@
 			"repository": "https://github.com/tatsushid/go-fastping",
 			"revision": "d7bb493dee3e090e2ffb6914adddf17c1e7c026c",
 			"branch": "master"
-		},
-		{
-			"importpath": "github.com/tredoe/term/sys",
-			"repository": "https://github.com/tredoe/term",
-			"revision": "e551c64f56c0ac0469b4db1b70918e05bfd3ab20",
-			"branch": "master",
-			"path": "/sys"
 		},
 		{
 			"importpath": "github.com/urfave/cli",

@@ -98,6 +98,11 @@ func (yp *YAMLRepo) FilterNodes(gName string, nNames ...string) ([]model.Node, e
 		}
 
 		g = initNodesByGroup(g)
+		// without node filter
+		if nNames == nil || len(nNames) == 0 {
+			return g.Nodes, nil
+		}
+
 		for _, n := range g.Nodes {
 			if utils.IsWildCharMatch(n.Name, nNames...) {
 				filterNodes = append(filterNodes, n)

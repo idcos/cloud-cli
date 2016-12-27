@@ -6,6 +6,8 @@ import (
 	"time"
 	"utils"
 
+	"strings"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -128,5 +130,9 @@ func compositCommand(input runner.ExecInput) string {
 	if input.ExecUser == "" {
 		return input.Command
 	}
-	return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
+	if strings.Index(input.Command, `'`) == -1 {
+		return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
+	} else {
+		return fmt.Sprintf(`su - "%s" -c "%s"`, input.ExecUser, input.Command)
+	}
 }

@@ -16,6 +16,13 @@ cd cloudcli
 gb build
 #+END_SRC
 
+或者使用make：
+#+BEGIN_SRC sh
+git clone https://github.com/idcos/cloudcli.git
+cd cloudcli
+make
+#+END_SRC
+
 编译完成后，为了方便以后使用，可以将 bin 目录下的二进制文件 cloudcli 放在系统 PATH 中。
 
 * 首次使用

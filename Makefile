@@ -14,10 +14,13 @@ RELEASE_DIR = ./release
 # target
 all: cli
 
-release: cli
+# release
+release:
 	@echo "[begin] release ==================="
-	-mkdir $(RELEASE_DIR)
-	cp $(BIN_CLOLUDCLI) $(RELEASE_DIR)
+	GOOS=darwin GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
+	GOOS=linux GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
+	GOOS=windows GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
+	tar czvf release.tar.gz ./bin/cloudcli-darwin-amd64 ./bin/cloudcli-windows-amd64.exe ./bin/cloudcli-linux-amd64
 	@echo "[end]   release ==================="
 
 cli: clean
@@ -29,5 +32,3 @@ cli: clean
 clean:
 	rm -f $(BIN_CLOLUDCLI)
 
-clean_release:
-	rm -rf $(RELEASE_DIR)

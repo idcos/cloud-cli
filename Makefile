@@ -20,7 +20,7 @@ release:
 	GOOS=darwin GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
 	GOOS=linux GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
 	GOOS=windows GOARCH=amd64 $(GB) build -ldflags "-X main.build=`git rev-parse HEAD`" $(TARGET_CLOUDCLI)
-	cd ./bin;	tar czvf release.tar.gz ./cloudcli-darwin-amd64 ./cloudcli-windows-amd64.exe ./cloudcli-linux-amd64
+	cd ./bin;	zip release.zip ./cloudcli-darwin-amd64 ./cloudcli-windows-amd64.exe ./cloudcli-linux-amd64
 	@echo "[end]   release ==================="
 
 cli: clean

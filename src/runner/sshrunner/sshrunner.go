@@ -125,5 +125,8 @@ func (sr *SSHRunner) RemotePathSize(input runner.RcpInput) (int64, error) {
 }
 
 func compositCommand(input runner.ExecInput) string {
+	if input.ExecUser == "" {
+		return input.Command
+	}
 	return fmt.Sprintf(`su - '%s' -c '%s'`, input.ExecUser, input.Command)
 }

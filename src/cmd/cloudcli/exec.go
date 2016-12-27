@@ -47,7 +47,7 @@ func initExecSubCmd(app *cli.App) {
 			},
 			cli.StringFlag{
 				Name:  "u,user",
-				Value: "root",
+				Value: "",
 				Usage: "user who exec the command",
 			},
 			cli.StringFlag{
@@ -127,6 +127,10 @@ func syncExecCmd(nodes []model.Node, ep execParams) error {
 	for _, n := range nodes {
 		fmt.Printf("EXCUTE \"%s\" on %s(%s):\n", utils.FgBoldGreen(ep.Cmd), utils.FgBoldGreen(n.Name), utils.FgBoldGreen(n.Host))
 		var runCmd = sshrunner.New(n.User, n.Password, n.KeyPath, n.Host, n.Port, conf.Main.FileTransBuf)
+		// exec cmd user == ssh login user
+		if ep.User == n.User {
+			ep.User = ""
+		}
 		var input = runner.ExecInput{
 			ExecHost: n.Host,
 			ExecUser: ep.User,
